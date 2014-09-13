@@ -543,7 +543,7 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 	{
 		if(grenade)
 		{
-			for (i=0, i<4, i++)
+			for (i=0; i<4; i++)
 			{
 				Grenade_Explode (grenade);
 			}
