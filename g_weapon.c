@@ -251,7 +251,7 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 =================
 fire_bullet
 
-Fires a single round.  Used for machinegun and chaingun.  Would be fine for
+Fires a round.  Used for machinegun and chaingun.  Would be fine for
 pistols, rifles, etc....
 =================
 */
@@ -369,11 +369,11 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 		bolt->touch (bolt, tr.ent, NULL, NULL);
 	}
 }	
-
-
+// cannot declare variables AFTER initial program block, declare all global variables at beginning of file  
+// there are NO constructors in C
 /*
 =================
-fire_grenade
+fire_grenade  -- function that gets called when the grenade is created
 =================
 */
 static void Grenade_Explode (edict_t *ent)
@@ -390,17 +390,22 @@ static void Grenade_Explode (edict_t *ent)
 		float	points;
 		vec3_t	v;
 		vec3_t	dir;
+		vec3_t	random;
+
+		random[0] = crandom();
+		random[1] = crandom();
+		random[2] = crandom();
 
 		VectorAdd (ent->enemy->mins, ent->enemy->maxs, v);
 		VectorMA (ent->enemy->s.origin, 0.5, v, v);
 		VectorSubtract (ent->s.origin, v, v);
 		points = ent->dmg - 0.5 * VectorLength (v);
-		VectorSubtract (ent->enemy->s.origin, ent->s.origin, dir);
+		VectorSubtract (ent->enemy->s.origin, ent->s.origin, random); //dir
 		if (ent->spawnflags & 1)
 			mod = MOD_HANDGRENADE;
 		else
 			mod = MOD_GRENADE;
-		T_Damage (ent->enemy, ent, ent->owner, dir, ent->s.origin, vec3_origin, (int)points, (int)points, DAMAGE_RADIUS, mod);
+		T_Damage (ent->enemy, ent, ent->owner, random, ent->s.origin, vec3_origin, (int)points, (int)points, DAMAGE_RADIUS, mod);
 	}
 
 	if (ent->spawnflags & 2)
@@ -461,7 +466,7 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	}
 
 	ent->enemy = other;
-	Grenade_Explode (ent);
+	Grenade_Explode (ent); // calling grenade_explode to referencing it
 }
 
 void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius)
@@ -473,8 +478,8 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	vectoangles (aimdir, dir);
 	AngleVectors (dir, forward, right, up);
 
-	grenade = G_Spawn();
-	VectorCopy (start, grenade->s.origin);
+	grenade = G_Spawn(); //grenade is not the data, is a pointer to the data
+	VectorCopy (start, grenade->s.origin); //s - structure that has physics data of entity
 	VectorScale (aimdir, speed, grenade->velocity);
 	VectorMA (grenade->velocity, 200 + crandom() * 10.0, up, grenade->velocity);
 	VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
@@ -499,6 +504,8 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 
 void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius, qboolean held)
 {
+	int		i;
+	
 	edict_t	*grenade;
 	vec3_t	dir;
 	vec3_t	forward, right, up;
@@ -533,7 +540,15 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 	grenade->s.sound = gi.soundindex("weapons/hgrenc1b.wav");
 
 	if (timer <= 0.0)
-		Grenade_Explode (grenade);
+	{
+		if(grenade)
+		{
+			for (i=0, i<4, i++)
+			{
+				Grenade_Explode (grenade);
+			}
+		}
+	}
 	else
 	{
 		gi.sound (self, CHAN_WEAPON, gi.soundindex ("weapons/hgrent1a.wav"), 1, ATTN_NORM, 0);
@@ -897,3 +912,10 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 
 	gi.linkentity (bfg);
 }
+
+
+/*DISCLAIMER -- ent COULD BE simply the parameter name 
+ex.	void rocket_touch (edict_t *ent...
+			IS EQUAL TO
+	void OnTriggerEnter2D(Collider2D col...
+*/

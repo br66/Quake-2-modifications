@@ -2099,7 +2099,7 @@ tank commander's head
 
 /*QUAKED item_health (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
-void SP_item_health (edict_t *self)
+void SP_item_health (edict_t *self) // declaring an edict named self. self is not an edict, it is a pointer to an edict
 {
 	if ( deathmatch->value && ((int)dmflags->value & DF_NO_HEALTH) )
 	{
