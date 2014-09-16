@@ -520,7 +520,7 @@ GRENADE
 ======================================================================
 */
 
-#define GRENADE_TIMER		3.0
+#define GRENADE_TIMER		6.0
 #define GRENADE_MINSPEED	400
 #define GRENADE_MAXSPEED	800
 

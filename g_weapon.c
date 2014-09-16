@@ -1,5 +1,6 @@
 #include "g_local.h"
 
+int thetimer = 6; //NEW
 
 /*
 =================
@@ -381,6 +382,10 @@ static void Grenade_Explode (edict_t *ent)
 	vec3_t		origin;
 	int			mod;
 
+	vec3_t	dir;
+	vec3_t	forward, right, up;
+	AngleVectors (dir, forward, right, up);
+
 	if (ent->owner->client)
 		PlayerNoise(ent->owner, ent->s.origin, PNOISE_IMPACT);
 
@@ -390,22 +395,17 @@ static void Grenade_Explode (edict_t *ent)
 		float	points;
 		vec3_t	v;
 		vec3_t	dir;
-		vec3_t	random;
-
-		random[0] = crandom();
-		random[1] = crandom();
-		random[2] = crandom();
 
 		VectorAdd (ent->enemy->mins, ent->enemy->maxs, v);
 		VectorMA (ent->enemy->s.origin, 0.5, v, v);
 		VectorSubtract (ent->s.origin, v, v);
 		points = ent->dmg - 0.5 * VectorLength (v);
-		VectorSubtract (ent->enemy->s.origin, ent->s.origin, random); //dir
+		VectorSubtract (ent->enemy->s.origin, ent->s.origin, dir);
 		if (ent->spawnflags & 1)
 			mod = MOD_HANDGRENADE;
 		else
 			mod = MOD_GRENADE;
-		T_Damage (ent->enemy, ent, ent->owner, random, ent->s.origin, vec3_origin, (int)points, (int)points, DAMAGE_RADIUS, mod);
+		T_Damage (ent->enemy, ent, ent->owner, dir, ent->s.origin, vec3_origin, (int)points, (int)points, DAMAGE_RADIUS, mod);
 	}
 
 	if (ent->spawnflags & 2)
@@ -434,6 +434,42 @@ static void Grenade_Explode (edict_t *ent)
 	}
 	gi.WritePosition (origin);
 	gi.multicast (ent->s.origin, MULTICAST_PHS);
+
+
+	if (thetimer == 6)
+	{
+		fire_grenade3 (ent->owner, ent->s.origin, ent->s.origin, 60, 0.2, 120);
+		thetimer = 5;
+	}
+	else if (thetimer == 5)
+	{
+		fire_grenade3 (ent->owner, ent->s.origin, ent->s.origin, 60, 0.2, 140);
+		thetimer = 4;
+	}
+	else if (thetimer == 4)
+	{
+		fire_grenade3 (ent->owner, ent->s.origin, ent->s.origin, 60, 0.2, 160);
+		thetimer = 3;
+	}
+	else if (thetimer == 3)
+	{
+		fire_grenade3 (ent->owner, ent->s.origin, ent->s.origin, 70, 0.2, 180);
+		thetimer = 2;
+	}
+	else if (thetimer == 2)
+	{
+		fire_grenade3 (ent->owner, ent->s.origin, ent->s.origin, 70, 0.2, 200);
+		thetimer = 1;
+	}
+	else if (thetimer == 1)
+	{
+		fire_grenade3 (ent->owner, ent->s.origin, ent->s.origin, 80, 0.2, 220);
+		thetimer = 0;
+	}
+	else
+	{
+		thetimer = 6;
+	}
 
 	G_FreeEdict (ent);
 }
@@ -503,9 +539,7 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 }
 
 void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius, qboolean held)
-{
-	int		i;
-	
+{	
 	edict_t	*grenade;
 	vec3_t	dir;
 	vec3_t	forward, right, up;
@@ -541,13 +575,7 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 
 	if (timer <= 0.0)
 	{
-		if(grenade)
-		{
-			for (i=0; i<4; i++)
-			{
-				Grenade_Explode (grenade);
-			}
-		}
+		Grenade_Explode (grenade);
 	}
 	else
 	{
@@ -556,7 +584,38 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 	}
 }
 
+void fire_grenade3 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, float timer, float damage_radius)
+{
+	edict_t	*grenade;
+	vec3_t	dir;
+	vec3_t	forward, right, up;
 
+	vectoangles (aimdir, dir);
+	AngleVectors (dir, forward, right, up);
+
+	grenade = G_Spawn(); //grenade is not the data, is a pointer to the data
+	VectorCopy (start, grenade->s.origin); //s - structure that has physics data of entity
+	//VectorScale (aimdir, speed, grenade->velocity);
+	//VectorMA (grenade->velocity, 200 + crandom() * 10.0, up, grenade->velocity);
+	//VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
+	//VectorSet (grenade->avelocity, 300, 300, 300);
+	grenade->movetype = MOVETYPE_BOUNCE;
+	grenade->clipmask = MASK_SHOT;
+	grenade->solid = SOLID_BBOX;
+	grenade->s.effects |= EF_GRENADE;
+	VectorClear (grenade->mins);
+	VectorClear (grenade->maxs);
+	grenade->s.modelindex = gi.modelindex ("models/objects/grenade2/tris.md2");
+	grenade->owner = self;
+	grenade->touch = Grenade_Touch;
+	grenade->nextthink = level.time + timer;
+	grenade->think = Grenade_Explode;
+	grenade->dmg = damage;
+	grenade->dmg_radius = damage_radius;
+	grenade->classname = "hgrenade";
+
+	gi.linkentity (grenade);
+}
 /*
 =================
 fire_rocket
