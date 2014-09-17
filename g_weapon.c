@@ -672,6 +672,12 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 	G_FreeEdict (ent);
 }
 
+void rocket_think(edict_t *self)
+{
+	//fire grenade function
+	//self->nextthink = level.time + 1;
+}
+
 void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage)
 {
 	edict_t	*rocket;
@@ -685,13 +691,13 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	rocket->clipmask = MASK_SHOT;
 	rocket->solid = SOLID_BBOX;
 	rocket->s.effects |= EF_ROCKET;
-	VectorClear (rocket->mins);
-	VectorClear (rocket->maxs);
+	VectorClear (rocket->mins); //bounding
+	VectorClear (rocket->maxs); //blocks
 	rocket->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
 	rocket->owner = self;
 	rocket->touch = rocket_touch;
-	rocket->nextthink = level.time + 8000/speed;
-	rocket->think = G_FreeEdict;
+	rocket->nextthink = level.time + 8000/speed; //sometime in the future
+	rocket->think = G_FreeEdict; //frees itself from game engine, probably not going to hit anything that matters
 	rocket->dmg = damage;
 	rocket->radius_dmg = radius_damage;
 	rocket->dmg_radius = damage_radius;
@@ -717,7 +723,7 @@ void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick
 	trace_t		tr;
 	edict_t		*ignore;
 	int			mask;
-	qboolean	water;
+	qboolean	water; //core techniques and algorthms in game programming daniel ... cortez ...
 
 	VectorMA (start, 8192, aimdir, end);
 	VectorCopy (start, from);

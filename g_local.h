@@ -947,8 +947,8 @@ struct gclient_s
 
 struct edict_s
 {
-	entity_state_t	s;
-	struct gclient_s	*client;	// NULL if not a player
+	entity_state_t	s;				//having the data
+	struct gclient_s	*client;	// NULL if not a player		//having a pointer to the data
 									// the server expects the first part
 									// of gclient_s to be a player_state_t
 									// but the rest of it is opaque
