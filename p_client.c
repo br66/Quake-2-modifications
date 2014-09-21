@@ -585,13 +585,13 @@ This is only called when the game first initializes in single player,
 but is called after each death and level change in deathmatch/respawn
 ==============
 */
-void InitClientPersistant (gclient_t *client)
-{
+void InitClientPersistant (gclient_t *client) //this is where you...
+{ //client structure
 	gitem_t		*item;
 
 	memset (&client->pers, 0, sizeof(client->pers));
 
-	item = FindItem("Blaster");
+	item = FindItem("Blaster"); //inital item upon spawn????
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
 
@@ -667,7 +667,7 @@ void FetchClientEntData (edict_t *ent)
 
 /*
 ================
-PlayersRangeFromSpot
+PlayersRangeFromSpot ??????
 
 Returns the distance to the nearest player from the given spot
 ================
