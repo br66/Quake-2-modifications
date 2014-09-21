@@ -17,7 +17,7 @@ void SP_misc_teleporter_dest (edict_t *ent);
 // we use carnal knowledge of the maps to fix the coop spot targetnames to match
 // that of the nearest named single player spot
 
-static void SP_FixCoopSpots (edict_t *self) //maps were not adhering to standards made by program
+static void SP_FixCoopSpots (edict_t *self)
 {
 	edict_t	*spot;
 	vec3_t	d;
@@ -123,7 +123,7 @@ void SP_info_player_coop(edict_t *self)
 		return;
 	}
 
-	if((Q_stricmp(level.mapname, "jail2") == 0)   ||  //maps needed hacking
+	if((Q_stricmp(level.mapname, "jail2") == 0)   ||
 	   (Q_stricmp(level.mapname, "jail4") == 0)   ||
 	   (Q_stricmp(level.mapname, "mine1") == 0)   ||
 	   (Q_stricmp(level.mapname, "mine2") == 0)   ||
@@ -140,7 +140,7 @@ void SP_info_player_coop(edict_t *self)
 	{
 		// invoke one of our gross, ugly, disgusting hacks
 		self->think = SP_FixCoopSpots;
-		self->nextthink = level.time + FRAMETIME; //TEH HACKS
+		self->nextthink = level.time + FRAMETIME;
 	}
 }
 
@@ -490,8 +490,8 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 
 	self->s.modelindex2 = 0;	// remove linked weapon model
 
-	self->s.angles[0] = 0; //yaw?
-	self->s.angles[2] = 0; //roll?
+	self->s.angles[0] = 0;
+	self->s.angles[2] = 0;
 
 	self->s.sound = 0;
 	self->client->weapon_sound = 0;
@@ -501,7 +501,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 //	self->solid = SOLID_NOT;
 	self->svflags |= SVF_DEADMONSTER;
 
-	if (!self->deadflag) //if not dead?
+	if (!self->deadflag)
 	{
 		self->client->respawn_time = level.time + 1.0;
 		LookAtKiller (self, inflictor, attacker);
@@ -572,7 +572,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 
 	self->deadflag = DEAD_DEAD;
 
-	gi.linkentity (self); //AND MAKE THEM REAL RIGHT NOW
+	gi.linkentity (self);
 }
 
 //=======================================================================
@@ -580,18 +580,18 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 /*
 ==============
 InitClientPersistant
-//MOTHERFUCKER SPELLED PERSISTENT WRONG
+
 This is only called when the game first initializes in single player,
-but is called after each death and level change in deathmatch/respawn
+but is called after each death and level change in deathmatch
 ==============
 */
-void InitClientPersistant (gclient_t *client) //this is where you...
-{ //client structure
+void InitClientPersistant (gclient_t *client)
+{
 	gitem_t		*item;
 
 	memset (&client->pers, 0, sizeof(client->pers));
 
-	item = FindItem("Blaster"); //inital item upon spawn????
+	item = FindItem("Blaster");
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
 
@@ -667,7 +667,7 @@ void FetchClientEntData (edict_t *ent)
 
 /*
 ================
-PlayersRangeFromSpot ??????
+PlayersRangeFromSpot
 
 Returns the distance to the nearest player from the given spot
 ================
