@@ -121,7 +121,7 @@ void DoRespawn (edict_t *ent)
 	gi.linkentity (ent);
 
 	// send an effect
-	ent->s.event = EV_ITEM_RESPAWN;
+	ent->s.event = EV_ITEM_RESPAWN; //this may actually be special effects
 }
 
 void SetRespawn (edict_t *ent, float delay)
@@ -1115,26 +1115,26 @@ void SpawnItem (edict_t *ent, gitem_t *item)
 gitem_t	itemlist[] = 
 {
 	{
-		NULL
-	},	// leave index 0 alone
+		NULL //in very first list everything is 0
+	},	// leave index 0 alone //global to entire project, no one knows how to access it, not really global, shades of global in C
 
 	//
 	// ARMOR
 	//
 
-/*QUAKED item_armor_body (.3 .3 1) (-16 -16 -16) (16 16 16)
+/*QUAKED item_armor_body (.3 .3 1) (-16 -16 -16) (16 16 16) //g_local.h
 */
 	{
-		"item_armor_body", 
+		"item_armor_body", //classname of the item, appears in map editor, defined as char string constant/pointer
 		Pickup_Armor,
 		NULL,
 		NULL,
 		NULL,
-		"misc/ar1_pkup.wav",
-		"models/items/armor/body/tris.md2", EF_ROTATE,
+		"misc/ar1_pkup.wav", // in the .pak files if all else fails, pak0.pak, looks in file system first then pak2, pak1, pak0
+		"models/items/armor/body/tris.md2", EF_ROTATE, //item rotatre colourmap.pcx = all the colors that can be in q2
 		NULL,
 /* icon */		"i_bodyarmor",
-/* pickup */	"Body Armor",
+/* pickup */	"Body Armor", //can change name but you must find other instances of it first //omg blaster is not pickupable
 /* width */		3,
 		0,
 		NULL,
@@ -1294,7 +1294,7 @@ always owned, never in the world
 */
 	{
 		"weapon_shotgun", 
-		Pickup_Weapon,
+		Pickup_Weapon, //<------make this null to disable? making this null means making it 0, won't the operating system stop the program?
 		Use_Weapon,
 		Drop_Weapon,
 		Weapon_Shotgun,
@@ -1412,16 +1412,16 @@ always owned, never in the world
 		Pickup_Weapon,
 		Use_Weapon,
 		Drop_Weapon,
-		Weapon_GrenadeLauncher,
+		Weapon_GrenadeLauncher, //weapon_think
 		"misc/w_pkup.wav",
-		"models/weapons/g_launch/tris.md2", EF_ROTATE,
-		"models/weapons/v_launch/tris.md2",
+		"models/weapons/g_launch/tris.md2", EF_ROTATE, //world
+		"models/weapons/v_launch/tris.md2",	//view
 /* icon */		"w_glauncher",
 /* pickup */	"Grenade Launcher",
-		0,
-		1,
+		0, // can't have more than 1 grenade laucher
+		1, //1 grenade launcher
 		"Grenades",
-		IT_WEAPON|IT_STAY_COOP,
+		IT_WEAPON|IT_STAY_COOP, //bitwise OR = one bitarray - compared per bit, each bit to a seperaete value, bit array, ujsed in alot of order programs, result is stored in the flasgs field, may stay for 2nd player to pick up
 		WEAP_GRENADELAUNCHER,
 		NULL,
 		0,
@@ -2161,6 +2161,10 @@ void SP_item_health_mega (edict_t *self)
 	SpawnItem (self, FindItem ("Health"));
 	gi.soundindex ("items/m_health.wav");
 	self->style = HEALTH_IGNORE_MAX|HEALTH_TIMED;
+
+
+/*QUAKED world_ammo_grenades (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
 }
 
 

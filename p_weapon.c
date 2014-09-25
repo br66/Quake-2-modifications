@@ -156,12 +156,12 @@ void ChangeWeapon (edict_t *ent)
 {
 	int i;
 
-	if (ent->client->grenade_time)
+	if (ent->client->grenade_time) //if the entity's client's grenade time exists... ???
 	{
-		ent->client->grenade_time = level.time;
-		ent->client->weapon_sound = 0;
-		weapon_grenade_fire (ent, false);
-		ent->client->grenade_time = 0;
+		ent->client->grenade_time = level.time; //it will equal level.time (wtf is level.time)
+		ent->client->weapon_sound = 0; //???
+		weapon_grenade_fire (ent, false); //fires a grenade (ent?), that is no longer held
+		ent->client->grenade_time = 0; //grenade time no linger equals level.time?
 	}
 
 	ent->client->pers.lastweapon = ent->client->pers.weapon;

@@ -193,9 +193,9 @@ typedef struct
 
 // gitem_t->flags
 #define	IT_WEAPON		1		// use makes active weapon
-#define	IT_AMMO			2
-#define IT_ARMOR		4
-#define IT_STAY_COOP	8
+#define	IT_AMMO			2		//looks like a bit array
+#define IT_ARMOR		4		//bitwise math
+#define IT_STAY_COOP	8		//numbers packed together into a at max 32-bit integer
 #define IT_KEY			16
 #define IT_POWERUP		32
 
@@ -214,15 +214,15 @@ typedef struct
 
 typedef struct gitem_s
 {
-	char		*classname;	// spawning name
-	qboolean	(*pickup)(struct edict_s *ent, struct edict_s *other);
-	void		(*use)(struct edict_s *ent, struct gitem_s *item);
+	char		*classname;	// spawning name //becomes char array
+	qboolean	(*pickup)(struct edict_s *ent, struct edict_s *other); // funct. pointer to a pickup function, called when item is pick up
+	void		(*use)(struct edict_s *ent, struct gitem_s *item); //pointers can be null
 	void		(*drop)(struct edict_s *ent, struct gitem_s *item);
 	void		(*weaponthink)(struct edict_s *ent);
 	char		*pickup_sound;
-	char		*world_model;
+	char		*world_model; // in world
 	int			world_model_flags;
-	char		*view_model;
+	char		*view_model; // in hand
 
 	// client side info
 	char		*icon;
@@ -239,7 +239,7 @@ typedef struct gitem_s
 	int			tag;
 
 	char		*precaches;		// string of all models, sounds, and images this item will use
-} gitem_t;
+} gitem_t; //defined structure as type
 
 
 

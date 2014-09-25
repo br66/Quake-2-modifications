@@ -54,7 +54,7 @@ qboolean fire_hit (edict_t *self, vec3_t aim, int damage, int kick)
 	VectorSubtract (self->enemy->s.origin, self->s.origin, dir);
 	range = VectorLength(dir);
 	if (range > aim[0])
-		return false;
+		return false; // i missed
 
 	if (aim[1] > self->mins[0] && aim[1] < self->maxs[0])
 	{
@@ -122,31 +122,31 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 	float		u;
 	vec3_t		water_start;
 	qboolean	water = false;
-	int			content_mask = MASK_SHOT | MASK_WATER;
+	int			content_mask = MASK_SHOT | MASK_WATER; //
 
-	tr = gi.trace (self->s.origin, NULL, NULL, start, self, MASK_SHOT);
-	if (!(tr.fraction < 1.0))
+	tr = gi.trace (self->s.origin, NULL, NULL, start, self, MASK_SHOT); //singel line trace form my orging to start(End of gun, lookignfor anything that mask shot would hit, to make sure yuo can't shoot through walls)
+	if (!(tr.fraction < 1.0)) // if didin;t hit snything
 	{
-		vectoangles (aimdir, dir);
+		vectoangles (aimdir, dir); //calculate ???
 		AngleVectors (dir, forward, right, up);
 
 		r = crandom()*hspread;
 		u = crandom()*vspread;
-		VectorMA (start, 8192, forward, end);
-		VectorMA (end, r, right, end);
+		VectorMA (start, 8192, forward, end); //project start forward 8192
+		VectorMA (end, r, right, end); //moving end based on ????
 		VectorMA (end, u, up, end);
 
-		if (gi.pointcontents (start) & MASK_WATER)
+		if (gi.pointcontents (start) & MASK_WATER) //if point contents of start (returns content mask), if bit that meean s water ]is true, if water start, if tip of gun is in water
 		{
 			water = true;
-			VectorCopy (start, water_start);
-			content_mask &= ~MASK_WATER;
+			VectorCopy (start, water_start); //copy strtying postionf to water start
+			content_mask &= ~MASK_WATER; //removing water from things you will clip againsty cuz YOU'RE already in water, no loinger cjeck for water
 		}
 
-		tr = gi.trace (start, NULL, NULL, end, self, content_mask);
+		tr = gi.trace (start, NULL, NULL, end, self, content_mask); //get anyhting that a gun should hit
 
-		// see if we hit water
-		if (tr.contents & MASK_WATER)
+		// see if we hit water, would not be treu if yuo started in water
+		if (tr.contents & MASK_WATER) //if they aere the same...
 		{
 			int		color;
 
@@ -155,9 +155,9 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 
 			if (!VectorCompare (start, tr.endpos))
 			{
-				if (tr.contents & CONTENTS_WATER)
+				if (tr.contents & CONTENTS_WATER) //if we hit water
 				{
-					if (strcmp(tr.surface->name, "*brwater") == 0)
+					if (strcmp(tr.surface->name, "*brwater") == 0) //check if brown water
 						color = SPLASH_BROWN_WATER;
 					else
 						color = SPLASH_BLUE_WATER;
@@ -171,22 +171,22 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 
 				if (color != SPLASH_UNKNOWN)
 				{
-					gi.WriteByte (svc_temp_entity);
-					gi.WriteByte (TE_SPLASH);
-					gi.WriteByte (8);
+					gi.WriteByte (svc_temp_entity); //3 //hey game engine do something 3 = temporary entity
+					gi.WriteByte (TE_SPLASH); // want entitty splash
+					gi.WriteByte (8); //8instances???
 					gi.WritePosition (tr.endpos);
 					gi.WriteDir (tr.plane.normal);
-					gi.WriteByte (color);
-					gi.multicast (tr.endpos, MULTICAST_PVS);
+					gi.WriteByte (color); //color prevuiolsy defined
+					gi.multicast (tr.endpos, MULTICAST_PVS); //make it real //equivalent to linkentity
 				}
 
 				// change bullet's course when it enters water
-				VectorSubtract (end, start, dir);
-				vectoangles (dir, dir);
-				AngleVectors (dir, forward, right, up);
+				VectorSubtract (end, start, dir); //saves result in direction
+				vectoangles (dir, dir); //takes vectors, creates anlges
+				AngleVectors (dir, forward, right, up); //get forward, right, up from angles
 				r = crandom()*hspread*2;
 				u = crandom()*vspread*2;
-				VectorMA (water_start, 8192, forward, end);
+				VectorMA (water_start, 8192, forward, end);//take this point move it in this many direction multiply it by forward, saves result in end
 				VectorMA (end, r, right, end);
 				VectorMA (end, u, up, end);
 			}
@@ -197,18 +197,18 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 	}
 
 	// send gun puff / flash
-	if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))
+	if (!((tr.surface) && (tr.surface->flags & SURF_SKY))) //makes rue i didn;t hit the sky //if pinter is populated, check pointers flags is set to the sky 
 	{
-		if (tr.fraction < 1.0)
+		if (tr.fraction < 1.0) //if hit something
 		{
-			if (tr.ent->takedamage)
+			if (tr.ent->takedamage) //can the thing we hit take damage
 			{
-				T_Damage (tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, DAMAGE_BULLET, mod);
+				T_Damage (tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, DAMAGE_BULLET, mod); //give damage
 			}
 			else
 			{
-				if (strncmp (tr.surface->name, "sky", 3) != 0)
-				{
+				if (strncmp (tr.surface->name, "sky", 3) != 0) //if surface is sky
+				{// make bullet impact "oof"
 					gi.WriteByte (svc_temp_entity);
 					gi.WriteByte (te_impact);
 					gi.WritePosition (tr.endpos);
@@ -216,7 +216,7 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 					gi.multicast (tr.endpos, MULTICAST_PVS);
 
 					if (self->client)
-						PlayerNoise(self, tr.endpos, PNOISE_IMPACT);
+						PlayerNoise(self, tr.endpos, PNOISE_IMPACT); //make sure player hears sound if near it
 				}
 			}
 		}
@@ -228,16 +228,16 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 		vec3_t	pos;
 
 		VectorSubtract (tr.endpos, water_start, dir);
-		VectorNormalize (dir);
-		VectorMA (tr.endpos, -2, dir, pos);
-		if (gi.pointcontents (pos) & MASK_WATER)
+		VectorNormalize (dir); //takes vector unknown length and =scales it
+		VectorMA (tr.endpos, -2, dir, pos); // 2units back from my ooint of impact
+		if (gi.pointcontents (pos) & MASK_WATER) //check if thers any water there
 			VectorCopy (pos, tr.endpos);
 		else
 			tr = gi.trace (pos, NULL, NULL, water_start, tr.ent, MASK_WATER);
 
 		VectorAdd (water_start, tr.endpos, pos);
 		VectorScale (pos, 0.5, pos);
-
+		//createing bubble trail
 		gi.WriteByte (svc_temp_entity);
 		gi.WriteByte (TE_BUBBLETRAIL);
 		gi.WritePosition (water_start);
@@ -433,11 +433,29 @@ static void Grenade_Explode (edict_t *ent)
 	G_FreeEdict (ent);
 }
 
+static void Grenade_Trans_Pickup (edict_t *ent) //NEW FUNCTION TO TURN GRENADES BACK INTO PICKUPS
+{
+	//ent->classname = "ammo_grenades";
+	//JUST CHANGING CLASSNAME MAY NOT BE SOLUTION; GRENADE IS AN ENTITY/ENT. DICTIONARY, AMMO GRENADES IS AN ITEM
+	//MUST CHANGE ENTITY INTO AN ITEM OR, ALTHOUGH MORE DIFFICULT, INIT THE PICKUP IN PLACE OF GRENADE, FREE EDICT OF GRENADE
+
+	//need name of item for spawning (?????=G_Spawn)
+	//wait a minute... SPAWNING BECOMES CHARACTER NAME
+	//ITEM_INDEX(ent->item) = G_Spawn(); //NOPE
+
+
+
+}
+
 static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
-	if (other == ent->owner)
-		return;
-
+	if (other == ent->owner)//this may be where i code something that would add ammo to player
+	{
+		//ent->item->ammo = 5;
+		Add_Ammo (ent, ent->item->quantity, 1);
+		G_FreeEdict(ent);
+		
+	}
 	if (surf && (surf->flags & SURF_SKY))
 	{
 		G_FreeEdict (ent);
@@ -473,7 +491,7 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	vectoangles (aimdir, dir);
 	AngleVectors (dir, forward, right, up);
 
-	grenade = G_Spawn();
+	grenade = G_Spawn(); //effectively create the grenade object
 	VectorCopy (start, grenade->s.origin);
 	VectorScale (aimdir, speed, grenade->velocity);
 	VectorMA (grenade->velocity, 200 + crandom() * 10.0, up, grenade->velocity);
@@ -488,8 +506,8 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	grenade->s.modelindex = gi.modelindex ("models/objects/grenade/tris.md2");
 	grenade->owner = self;
 	grenade->touch = Grenade_Touch;
-	grenade->nextthink = level.time + timer;
-	grenade->think = Grenade_Explode;
+	grenade->nextthink = level.time + timer; //HOW DOES IT KNOW TO GO TO THINK
+	grenade->think = Grenade_Touch; //CHANGE GRENADE THINK TO TURN THIS GRENADE INTO A PICKUP, CREATE FUNCTION TO CHANGE CLASSNAME?
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "grenade";

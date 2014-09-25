@@ -243,7 +243,7 @@ float Q_fabs (float f)
 }
 
 #if defined _M_IX86 && !defined C_ONLY
-#pragma warning (disable:4035)
+#pragma warning (disable:4035) //oh sit inline assemnbly, diasbvling a warninig on thid line
 __declspec( naked ) long Q_ftol( float f )
 {
 	static int tmp;
@@ -251,7 +251,7 @@ __declspec( naked ) long Q_ftol( float f )
 	__asm fistp tmp
 	__asm mov eax, tmp
 	__asm ret
-}
+}//SHITE
 #pragma warning (default:4035)
 #endif
 

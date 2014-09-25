@@ -398,23 +398,23 @@ void TossClientWeapon (edict_t *self)
 	if (!deathmatch->value)
 		return;
 
-	item = self->client->pers.weapon;
-	if (! self->client->pers.inventory[self->client->ammo_index] )
-		item = NULL;
-	if (item && (strcmp (item->pickup_name, "Blaster") == 0))
-		item = NULL;
+	item = self->client->pers.weapon; //item is the player's weapon on hand???
+	if (! self->client->pers.inventory[self->client->ammo_index] ) //if i have 0 ammo?
+		item = NULL;//weapon go bye-bye?
+	if (item && (strcmp (item->pickup_name, "Blaster") == 0)) //if i don't have the blaster?
+		item = NULL;//weapon go bye-bye?
 
 	if (!((int)(dmflags->value) & DF_QUAD_DROP))
-		quad = false;
+		quad = false; //???
 	else
 		quad = (self->client->quad_framenum > (level.framenum + 10));
-
+	//???
 	if (item && quad)
 		spread = 22.5;
 	else
 		spread = 0.0;
 
-	if (item)
+	if (item) //is this the action of dropping a spawn item?
 	{
 		self->client->v_angle[YAW] -= spread;
 		drop = Drop_Item (self, item);
@@ -422,7 +422,7 @@ void TossClientWeapon (edict_t *self)
 		drop->spawnflags = DROPPED_PLAYER_ITEM;
 	}
 
-	if (quad)
+	if (quad) //WTF IS QUAD
 	{
 		self->client->v_angle[YAW] += spread;
 		drop = Drop_Item (self, FindItemByClassname ("item_quad"));

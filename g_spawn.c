@@ -1,11 +1,11 @@
 
 #include "g_local.h"
 
-typedef struct
+typedef struct 
 {
 	char	*name;
 	void	(*spawn)(edict_t *ent);
-} spawn_t;
+} spawn_t; //how things spawn in the game
 
 
 void SP_item_health (edict_t *self);
@@ -132,8 +132,8 @@ spawn_t	spawns[] = {
 	{"item_health_large", SP_item_health_large},
 	{"item_health_mega", SP_item_health_mega},
 
-	{"info_player_start", SP_info_player_start},
-	{"info_player_deathmatch", SP_info_player_deathmatch},
+	{"info_player_start", SP_info_player_start}, //START IN SINGLE PLAYER
+	{"info_player_deathmatch", SP_info_player_deathmatch}, //START IN MULTOPLAYER
 	{"info_player_coop", SP_info_player_coop},
 	{"info_player_intermission", SP_info_player_intermission},
 
@@ -281,7 +281,7 @@ void ED_CallSpawn (edict_t *ent)
 	}
 
 	// check normal spawn functions
-	for (s=spawns ; s->name ; s++)
+	for (s=spawns ; s->name ; s++) //the nnesct spawn, then the nest, then the next
 	{
 		if (!strcmp(s->name, ent->classname))
 		{	// found it
