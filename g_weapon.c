@@ -433,56 +433,6 @@ static void Grenade_Explode (edict_t *ent)
 	G_FreeEdict (ent);
 }
 
-static void Grenade_Trans_Pickup (edict_t *ent) //NEW FUNCTION TO TURN GRENADES BACK INTO PICKUPS
-{
-	//ent->classname = "ammo_grenades";
-	//JUST CHANGING CLASSNAME MAY NOT BE SOLUTION; GRENADE IS AN ENTITY/ENT. DICTIONARY, AMMO GRENADES IS AN ITEM
-	//MUST CHANGE ENTITY INTO AN ITEM OR, ALTHOUGH MORE DIFFICULT, INIT THE PICKUP IN PLACE OF GRENADE, FREE EDICT OF GRENADE
-
-	//need name of item for spawning (?????=G_Spawn)
-	//wait a minute... SPAWNING BECOMES CHARACTER NAME
-	//ITEM_INDEX(ent->item) = G_Spawn(); //NOPE
-
-	//FOUND FUNCTION "FindItemByClassname"!!!!!!!!!!!!!!!!!!!
-
-	gitem_t	*item;	//so I can get item classname
-	edict_t	*eItem;	//turn item into an entity
-	vec3_t	angles; //to create rotation effect
-
-	item = FindItemByClassname("ammo_grenades");
-	if(!item)
-		return;
-
-	eItem = G_Spawn();
-	eItem->item = item; ////turn item into an entity
-	//strcpy(eItem->classname, "ammo_grenades");//hmm... this breaks the game: immediate force close
-	VectorSet (eItem->mins, -15,-15,-15); //mininmum size of item entity???
-	VectorSet(eItem->maxs, -15,-15,-15); //maximum size of entity???
-	gi.setmodel(eItem,eItem->item->world_model); //setting the model
-	//special effects 
-	eItem->s.effects = eItem->item->world_model_flags;
-	eItem->s.renderfx = RF_GLOW;
-	//do whatever touch_item does
-	eItem->touch = Touch_Item;
-	angles[0] = 0;
-    angles[1] = rand() % 360; //now it will rotate on teh y axis
-    angles[2] = 0;
-	//probably won't work if entity isn't solid!
-	eItem->solid = SOLID_TRIGGER;
-	VectorCopy (ent->s.origin, eItem->s.origin);
-	//ent->s.origin[0] += 16;//moves its z postition
-	eItem->s.origin[2] += 20; //item now appears, but not pickupable
-	gi.linkentity(eItem); //something's happening i don't know what, seems to be moving up, still not pickupable --
-
-	//HOLY SHIT
-	//I DID SOMETHING THAT WORKS
-	//return;
-	//not gonna need the launched grenade entity anymore
-	G_FreeEdict(ent);
-
-	//WILL PROBABLY NOT USE THIS ANYMORE; UPDATED VERSION RIGHT BELOW
-}
-
 static void itemCreator (edict_t *ent, char *classname) //NEW ----------------------------------------------------------
 {
 	//NEW FUNCTION: ITEM CREATOR - PRETTY SELF-EXPLANATORY, CREATES ITEM BASED ON CLASSNAME GIVEN IN
@@ -556,6 +506,12 @@ static void itemCreator (edict_t *ent, char *classname) //NEW ------------------
 	//-----------------------------------------------------------------------------------------
 }
 
+static void Grenade_To_Ammo (edict_t *ent) //REMOVED OLD CODE, REPLACED W/ CODE RIGHT ABOVE
+{
+	itemCreator(ent, "ammo_grenades");
+}
+
+
 static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
 	if (other == ent->owner)//this may be where i code something that would add ammo to player
@@ -615,9 +571,9 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	VectorClear (grenade->maxs);
 	grenade->s.modelindex = gi.modelindex ("models/objects/grenade/tris.md2");
 	grenade->owner = self;
-	grenade->touch = Grenade_Touch;
+	grenade->touch = Grenade_Touch; //where are the parameters?
 	grenade->nextthink = level.time + timer; //HOW DOES IT KNOW TO GO TO THINK
-	grenade->think = Grenade_Trans_Pickup; //CHANGE GRENADE THINK TO TURN THIS GRENADE INTO A PICKUP, CREATE FUNCTION TO CHANGE CLASSNAME?
+	grenade->think = Grenade_To_Ammo;
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "grenade";
