@@ -454,40 +454,106 @@ static void Grenade_Trans_Pickup (edict_t *ent) //NEW FUNCTION TO TURN GRENADES 
 		return;
 
 	eItem = G_Spawn();
-
 	eItem->item = item; ////turn item into an entity
 	//strcpy(eItem->classname, "ammo_grenades");//hmm... this breaks the game: immediate force close
 	VectorSet (eItem->mins, -15,-15,-15); //mininmum size of item entity???
 	VectorSet(eItem->maxs, -15,-15,-15); //maximum size of entity???
 	gi.setmodel(eItem,eItem->item->world_model); //setting the model
-	
-	//special effects
+	//special effects 
 	eItem->s.effects = eItem->item->world_model_flags;
 	eItem->s.renderfx = RF_GLOW;
-
 	//do whatever touch_item does
 	eItem->touch = Touch_Item;
-
 	angles[0] = 0;
     angles[1] = rand() % 360; //now it will rotate on teh y axis
     angles[2] = 0;
-
 	//probably won't work if entity isn't solid!
 	eItem->solid = SOLID_TRIGGER;
-
 	VectorCopy (ent->s.origin, eItem->s.origin);
 	//ent->s.origin[0] += 16;//moves its z postition
 	eItem->s.origin[2] += 20; //item now appears, but not pickupable
-	
-	gi.linkentity(eItem); //something's happening i don't know what, seems to be moving up, still not pickupable
+	gi.linkentity(eItem); //something's happening i don't know what, seems to be moving up, still not pickupable --
 
 	//HOLY SHIT
 	//I DID SOMETHING THAT WORKS
-
 	//return;
-
 	//not gonna need the launched grenade entity anymore
 	G_FreeEdict(ent);
+
+	//WILL PROBABLY NOT USE THIS ANYMORE; UPDATED VERSION RIGHT BELOW
+}
+
+static void itemCreator (edict_t *ent, char *classname) //NEW ----------------------------------------------------------
+{
+	//NEW FUNCTION: ITEM CREATOR - PRETTY SELF-EXPLANATORY, CREATES ITEM BASED ON CLASSNAME GIVEN IN
+	//SECOND PARAMETER (char *classname)
+
+	gitem_t	*item;			//whatever classname given will be attached to this item pointer
+	edict_t	*entityItem;	//the item's classname will be given to the entity
+	vec3_t	angles;			//to create rotation effect
+
+	// 1. GET THE CLASSNAME THAT WAS ASKED FOR WHEN THE FUNCTION WAS CALLED
+	
+	item = FindItemByClassname(classname); //should this be &classname????
+	if(!item) //if item pointer points to something that does not exist, it is a null pointer; don't do shit
+		return;
+	//---------------------------------------------------------------------------------------
+
+	// 2. WILL SPAWN "entityItem", BUT IT WILL NOT SHOW UP AT FIRST BECAUSE WE HAVEN'T GIVEN THE ENTITY ANY SPECIAL
+	// EFFECTS, MODEL, CLASSNAME, POSITION, SIZE, OR EVEN TOLD IT THAT IT'S SOLID YET
+
+	entityItem = G_Spawn();
+	//----------------------------------------------------------------------------------------
+
+	// 3. "entityItem" IS WHERE WE WILL STORE THE INFORMATION THAT WILL MAKE IT AN ENTITY WITH ITEM PROPERTIES
+	// I WILL NOW GIVE IT THOSE PROPERTIES, REMEMBER THESE PROPERTIES WILL VARY DEPENDING ON THE CLASSNAME GIVEN
+
+	entityItem->item = item;	//AN ENTITY CAN BE ALMOST ANYTHING.  THE ENTITY DICTIONARY STRUCTURE HAS AN ATTRIBUTE
+								//FOR ITEMS, WE WILL USE IT AND MAKE IT EQUAL TO THE CLASSNAME OF THE ITEM THAT WAS GIVEN
+	//-----------------------------------------------------------------------------------------
+
+	// 4. IT IS NOW AN ITEM ENTITY, NOW I WILL GIVE THE BEHAVIOR OF AN ITEM
+	//  4.1 IT WILL APPEAR APPROXIMATELY THE SAME PLACE AS THE ENTITY THAT CALLED THIS FUNCTION -------
+
+	VectorCopy (ent->s.origin, entityItem->s.origin);	//COPYING THE POSITION OF ENTITY THAT CALLED THIS FUNCTION
+														//"s.origin" IS A VECTOR (x, y, z) a.k.a. WHERE THE OBJECT WILL BE POSITIONED
+
+	entityItem->s.origin[2] += 15;	// FOR SOME REASON, THE Z OF THE OBJECT (s.origin[2] IS THE Z) MUST BE BROUGHT UP
+									// A LITTLE BIT, OTHERWISE IT SEEMS TO APPEAR UNDER THE OBJECT AND IN THE GROUND
+	//  4.2 SIZE OF THE ENTITY?
+
+	VectorSet (entityItem->mins, -15,-15,-15); //mininmum size of item entity???
+	VectorSet(entityItem->maxs, -15,-15,-15); //maximum size of entity???
+	
+	//  4.3 SOLIDITY OF THE ENTITY
+
+	entityItem->solid = SOLID_TRIGGER; //THIS WILL MAKE THE ITEM ENTITY SOLID SO IT IS AFFECTED BY COLLISIONS
+
+	//  4.4 GIVE IT THE INSTRUCTIONS OF WHAT TO DO WHEN COLLIDED WITH
+
+	entityItem->touch = Touch_Item; //SELF-EXPLANATORY, YES?
+
+	//  4.5 3D MODEL OF THE ENTITY (YOU WILL NOW BE ABLE TO SEE THE ITEM ENTITY)
+
+	gi.setmodel(entityItem, entityItem->item->world_model); //SET ITEM ENTITY'S MODEL BY FINDING IT BY CHARACTER NAME
+															//("...world_model")
+	//  4.6 SPECIAL EFFECTS OF THE ENTITY
+
+	entityItem->s.effects = entityItem->item->world_model_flags;	//FIND MY SPECIAL EFFECTS USUALLY ATTACHED TO THIS ITEM
+	entityItem->s.renderfx = RF_GLOW;								//LIKE ALL ITEMS, GLOW
+
+	angles[0] = 0;
+    angles[1] = rand() % 360; //THIS WILL MAKE IT ROTATE ON THE Y AXIS
+    angles[2] = 0;
+
+	//  4.7 FINAL INSTRUCTIONS
+
+	gi.linkentity(entityItem); //LINK ALL THE CHANGES I MADE TO THE ITEM ENTITY TO.... THE ITEM ENTITY, IN OTHER WORDS, UPDATE IT
+	
+	G_FreeEdict(ent);	// WE DO NOT NEED THE ENTITY THAT CALLED THIS FUNCTION ANYMORE, IT SHOULD BE REMOVED FROM THE WORLD TO MAKE
+						// TO MAKE SPACE FOR OTHER ENTITIES
+	//FINISHED
+	//-----------------------------------------------------------------------------------------
 }
 
 static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
