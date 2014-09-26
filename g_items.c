@@ -52,7 +52,7 @@ gitem_t	*GetItemByIndex (int index)
 /*
 ===============
 FindItemByClassname
-
+//USE THIS TO CREATE ITEMS?????????????????????????????
 ===============
 */
 gitem_t	*FindItemByClassname (char *classname)
@@ -448,7 +448,7 @@ qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count)
 	else
 		return false;
 
-	index = ITEM_INDEX(item);
+	index = ITEM_INDEX(item); // ????
 
 	if (ent->client->pers.inventory[index] == max)
 		return false;

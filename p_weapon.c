@@ -521,6 +521,7 @@ GRENADE
 */
 
 #define GRENADE_TIMER		3.0
+#define ALT_GRENADE_TIMER	9.0 //NEW - ALTERNATE GRENADE TIMER
 #define GRENADE_MINSPEED	400
 #define GRENADE_MAXSPEED	800
 
@@ -543,7 +544,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 
 	timer = ent->client->grenade_time - level.time;
-	speed = GRENADE_MINSPEED + (GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / GRENADE_TIMER);
+	speed = GRENADE_MINSPEED + (ALT_GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / ALT_GRENADE_TIMER); //CHANGED
 	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
@@ -631,7 +632,7 @@ void Weapon_Grenade (edict_t *ent)
 		{
 			if (!ent->client->grenade_time)
 			{
-				ent->client->grenade_time = level.time + GRENADE_TIMER + 0.2;
+				ent->client->grenade_time = level.time + ALT_GRENADE_TIMER + 0.2;
 				ent->client->weapon_sound = gi.soundindex("weapons/hgrenc1b.wav");
 			}
 
@@ -706,7 +707,7 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
+	fire_grenade (ent, start, forward, damage, 600, 9.5, radius); //CHANGING THE TIMER FROM 2.5 TO 9.5
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
