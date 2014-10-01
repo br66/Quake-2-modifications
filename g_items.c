@@ -480,7 +480,7 @@ qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 	if (!Add_Ammo (other, ent->item, count))
 		return false;
 
-	if (weapon && !oldcount)
+	if (weapon && !oldcount) //??
 	{
 		if (other->client->pers.weapon != ent->item && ( !deathmatch->value || other->client->pers.weapon == FindItem("blaster") ) )
 			other->client->newweapon = ent->item;
@@ -1071,7 +1071,7 @@ void SpawnItem (edict_t *ent, gitem_t *item)
 				return;
 			}
 		}
-		if ( (int)dmflags->value & DF_NO_HEALTH )
+		if ( (int)dmflags->value & DF_NO_HEALTH ) //um i definitely saw health packs in deathmatch?
 		{
 			if (item->pickup == Pickup_Health || item->pickup == Pickup_Adrenaline || item->pickup == Pickup_AncientHead)
 			{
@@ -1440,7 +1440,7 @@ always owned, never in the world
 		"models/weapons/g_rocket/tris.md2", EF_ROTATE,
 		"models/weapons/v_rocket/tris.md2",
 /* icon */		"w_rlauncher",
-/* pickup */	"Rocket Launcher",
+/* pickup */	"Decoy Launcher",
 		0,
 		1,
 		"Rockets",

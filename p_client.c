@@ -1732,6 +1732,11 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		if (other->inuse && other->client->chase_target == ent)
 			UpdateChaseCam(other);
 	}
+
+	//if clinent think delay leass than equal to 0
+	//client think delay == 100;
+	//think slowly
+	//gi.centerprintf(
 }
 
 

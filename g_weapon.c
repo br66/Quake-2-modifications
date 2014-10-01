@@ -33,6 +33,19 @@ static void check_dodge (edict_t *self, vec3_t start, vec3_t dir, int speed)
 	}
 }
 
+/*
+=================
+NEW FUNCTION: AMMO INCREMENTOR
+Can give ammo to any weapon.
+=================
+*/
+static void ammoIncrement (edict_t *ent, char *classname, int addNum)
+{
+	gitem_t		*ammo;
+
+	ammo = FindItem (classname);
+	Add_Ammo (ent->owner, ammo, addNum);
+}
 
 /*
 =================
@@ -433,6 +446,71 @@ static void Grenade_Explode (edict_t *ent)
 	G_FreeEdict (ent);
 }
 
+
+//-------------------------------------------------------------------------------------------------------
+void Homing_Think (edict_t *grenade)
+{
+	vec3_t dir, forward, right, up; // dir is going to be distance between 
+	edict_t *ent = NULL;
+	edict_t *best = NULL;
+	float b_dist = 99999;
+	float dist = 0;
+
+	if (grenade->delay > level.time)
+    return;
+
+	while ((ent = findradius (ent, grenade->s.origin, 1500)) != NULL) //ENT IS A SPHERICAL AREA, SIZE IS 1500, WILL LOOK THRU ENTIRE ENTITY LIST TO SEE IF ANYTHING HERE IS WITHIN THE RANGE OF GRENADE AS ENT
+	{
+		if (ent == grenade->owner)
+		continue;
+		if (!ent->takedamage)
+		continue;
+		if (OnSameTeam(ent, grenade->owner)) 
+		continue;
+		if (ent->deadflag == DEAD_DEAD)
+		continue;
+		if (!CanDamage (grenade, ent))
+		continue;
+		VectorSubtract (ent->s.origin, grenade->s.origin, dir); //DISTANCE BETWEEN THING THAT IS IN RANGE AND GRENADE
+		dist = VectorLength (dir); //VECTOR LENGTH USES PYTH. THEOREM TO CALCULATE, a^2 + b^2 = c^2 , "vectorLength (dir)" IS C
+
+		//DIR FROM VECTOR SUBTRACT IS A POSITION, IS NOT DISTANCE, NEED DISTANCE TO KNOW WHERE TO MOVE
+		
+		if (dist < b_dist) //IF THAT DISTANCE IS NOT TOO FAR...
+		{
+			b_dist = dist; //IT IS THE BEST DISTANCE TO GO...
+			best = ent; //THIS ENTITY IS THE BEST ONE TO TARGET
+		}
+	}
+	
+	grenade->goalentity = best; //WE HAVE THE TARGETED PLAYER, AND ITS DISTANCE (WHICH IS NOW ACTUALLY DISTANCE AND NOT JUST A POSITION
+
+	if (grenade->goalentity)
+	{
+		// Calculate some directional stuff..
+		VectorSubtract(grenade->goalentity->s.origin, grenade->s.origin, dir); //DISTANCE BETWEEN GRENADE AND THE TARGET
+		vectoangles (dir, dir); // ???
+		VectorCopy (dir, grenade->s.angles); //DISTANCE BTWN G & T WILL BE MY ANGLES
+		VectorCopy (dir, grenade->movedir); //AND THE DIRECTION I WILL BE IN
+		AngleVectors(dir, forward, right, up);
+		right[0] += 5 * crandom(); //???
+		right[1] += 5 * crandom(); //???
+		right[2] = 0; //????
+		VectorNormalize(dir); // FINDING THE NORMAL OF "DISTANCE BETWEEN" ???
+		VectorMA(dir, 20 + 20 * random(), up, grenade->velocity); //USING IT FOR SPEED/VELOCITY FOR ???
+		VectorMA(dir, 10 * crandom(), right, grenade->velocity); //SEEMS LIKE SPEED AND DIRECTION WILL VARY BASED ON DIR
+		VectorMA(dir, 250, forward, grenade->velocity);
+    
+		//make it roll :)
+		VectorSet (grenade->avelocity, 0, VectorLength (grenade->velocity), 0); // is that the right axis??
+		grenade->groundentity = NULL; //SCREW TRYING TO HIT THE TARGET AT THIS POINT; RESET!	
+  }
+  else if (rand() % 20 == 0)
+    grenade->think (grenade); // blow it up randomly if it can't find a target
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+
 static void itemCreator (edict_t *ent, char *classname) //NEW ----------------------------------------------------------
 {
 	//NEW FUNCTION: ITEM CREATOR - PRETTY SELF-EXPLANATORY, CREATES ITEM BASED ON CLASSNAME GIVEN IN
@@ -571,7 +649,7 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	VectorClear (grenade->maxs);
 	grenade->s.modelindex = gi.modelindex ("models/objects/grenade/tris.md2");
 	grenade->owner = self;
-	grenade->touch = Grenade_Touch; //where are the parameters?
+	grenade->touch = Grenade_Touch;
 	grenade->nextthink = level.time + timer; //HOW DOES IT KNOW TO GO TO THINK
 	grenade->think = Grenade_To_Ammo;
 	grenade->dmg = damage;
@@ -625,6 +703,43 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 	}
 }
 
+void Fire_Homing_Grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float damage_radius)
+{
+  edict_t *grenade;
+  vec3_t dir, forward, right, up;
+  vectoangles (aimdir, dir);
+  AngleVectors (dir, forward, right, up);
+
+  grenade = G_Spawn();
+  grenade->owner = self;
+  //grenade->activator = self;
+  grenade->goalentity = NULL; // Targeted Player.
+  grenade->classname = "hominggrenade";
+  VectorCopy (start, grenade->s.origin);
+  //grenade->s.origin[2] += 10;
+  VectorScale (aimdir, speed, grenade->velocity);
+  VectorMA (grenade->velocity, 100 + random() * 30.0, up, grenade->velocity);
+  VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
+  VectorSet (grenade->avelocity, 300, 300, 300);
+  grenade->movetype = MOVETYPE_BOUNCE;
+  grenade->clipmask = MASK_SHOT;
+  grenade->solid = SOLID_BBOX;
+  grenade->s.effects |= EF_GRENADE;
+  VectorSet(grenade->mins, -3, -3, -3); //WHY SMALLER?
+  VectorSet(grenade->maxs, 3, 3, 3);
+  grenade->s.modelindex = gi.modelindex("models/objects/grenade2/tris.md2");
+  grenade->dmg = damage;
+  grenade->dmg_radius = damage_radius;
+  grenade->spawnflags = 1; //WTF
+  grenade->s.sound = gi.soundindex("world/airhiss1.wav");
+  grenade->delay = level.time + 1.5;
+  grenade->touch = Grenade_Touch;
+  grenade->prethink = Homing_Think;
+  grenade->nextthink = level.time + 10.0;
+  grenade->think = Grenade_Explode;
+  gi.linkentity(grenade);
+}
+
 
 /*
 =================
@@ -636,12 +751,21 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 	vec3_t		origin;
 	int			n;
 
+	gitem_t		*ammo; //NEW
+
 	if (other == ent->owner)
 		return;
 
 	if (surf && (surf->flags & SURF_SKY))
 	{
+		//ent->owner->client->pers.inventory[index] += count;
+		ammo = FindItem ("Rockets");//NEW
+		Add_Ammo (ent->owner, ammo, 1); //NEW
+
 		G_FreeEdict (ent);
+		//will use this to test adding ammo
+		//but how can i when ent isn't client?
+		//ent->client->ammo_index??
 		return;
 	}
 

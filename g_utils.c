@@ -65,7 +65,7 @@ edict_t *findradius (edict_t *from, vec3_t org, float rad)
 		from = g_edicts;
 	else
 		from++;
-	for ( ; from < &g_edicts[globals.num_edicts]; from++)
+	for ( ; from < &g_edicts[globals.num_edicts]; from++) // <<< LOOKING THROUGH ENTIRE ENTITY LIST
 	{
 		if (!from->inuse)
 			continue;

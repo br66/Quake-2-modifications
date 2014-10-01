@@ -541,7 +541,7 @@ void supertank_attack(edict_t *self)
 	//r = random();
 
 	// Attack 1 == Chaingun
-	// Attack 2 == Rocket Launcher
+	// Attack 2 == Rocket Launcher //NOW DECOY LAuncher
 
 	if (range <= 160)
 	{

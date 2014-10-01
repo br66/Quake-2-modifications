@@ -110,7 +110,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 			return false;	// leave the weapon for others to pickup
 	}
 
-	other->client->pers.inventory[index]++;
+	other->client->pers.inventory[index]++; //adds a new weapon to the inventory???
 
 	if (!(ent->spawnflags & DROPPED_ITEM) )
 	{
@@ -546,6 +546,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	timer = ent->client->grenade_time - level.time;
 	speed = GRENADE_MINSPEED + (ALT_GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / ALT_GRENADE_TIMER); //CHANGED
 	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held);
+	//Fire_Homing_Grenade (ent, start, forward, damage, speed, radius);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
 		ent->client->pers.inventory[ent->client->ammo_index]--;
@@ -1215,6 +1216,11 @@ void Weapon_Shotgun (edict_t *ent)
 	static int	fire_frames[]	= {8, 9, 0};
 
 	Weapon_Generic (ent, 7, 18, 36, 39, pause_frames, fire_frames, weapon_shotgun_fire);
+}
+
+void Ball_Absorb (edict_t *ent)
+{
+	//ent->touch = Grenade_Touch;
 }
 
 
