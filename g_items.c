@@ -291,7 +291,7 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 			other->client->pers.inventory[index] = other->client->pers.max_grenades;
 	}
 
-	item = FindItem("Rockets");
+	item = FindItem("Decoys");
 	if (item)
 	{
 		index = ITEM_INDEX(item);
@@ -1443,7 +1443,7 @@ always owned, never in the world
 /* pickup */	"Decoy Launcher",
 		0,
 		1,
-		"Rockets",
+		"Decoys",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_ROCKETLAUNCHER,
 		NULL,
@@ -1605,7 +1605,7 @@ always owned, never in the world
 		"models/items/ammo/rockets/medium/tris.md2", 0,
 		NULL,
 /* icon */		"a_rockets",
-/* pickup */	"Rockets",
+/* pickup */	"Decoys",
 /* width */		3,
 		5,
 		NULL,

@@ -759,7 +759,7 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 	if (surf && (surf->flags & SURF_SKY))
 	{
 		//ent->owner->client->pers.inventory[index] += count;
-		ammo = FindItem ("Rockets");//NEW
+		ammo = FindItem ("Decoys");//NEW
 		Add_Ammo (ent->owner, ammo, 1); //NEW
 
 		G_FreeEdict (ent);
@@ -795,6 +795,7 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 
 	T_RadiusDamage(ent, ent->owner, ent->radius_dmg, other, ent->dmg_radius, MOD_R_SPLASH);
 
+	/*
 	gi.WriteByte (svc_temp_entity);
 	if (ent->waterlevel)
 		gi.WriteByte (TE_ROCKET_EXPLOSION_WATER);
@@ -802,37 +803,108 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 		gi.WriteByte (TE_ROCKET_EXPLOSION);
 	gi.WritePosition (origin);
 	gi.multicast (ent->s.origin, MULTICAST_PHS);
+	*/
 
-	G_FreeEdict (ent);
+	//G_FreeEdict (ent);
 }
 
 void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage)
 {
 	edict_t	*rocket;
 
+	int randNum; //NEW
+	vec3_t playerMin = {-16, -16, -24};
+	vec3_t playerMax = {16, 16, 32};
+
 	rocket = G_Spawn();
 	VectorCopy (start, rocket->s.origin);
 	VectorCopy (dir, rocket->movedir);
 	vectoangles (dir, rocket->s.angles);
 	VectorScale (dir, speed, rocket->velocity);
-	rocket->movetype = MOVETYPE_FLYMISSILE;
-	rocket->clipmask = MASK_SHOT;
-	rocket->solid = SOLID_BBOX;
-	rocket->s.effects |= EF_ROCKET;
-	VectorClear (rocket->mins);
-	VectorClear (rocket->maxs);
-	rocket->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
-	rocket->owner = self;
-	rocket->touch = rocket_touch;
-	rocket->nextthink = level.time + 8000/speed;
-	rocket->think = G_FreeEdict;
-	rocket->dmg = damage;
-	rocket->radius_dmg = radius_damage;
-	rocket->dmg_radius = damage_radius;
-	rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
-	rocket->classname = "rocket";
-
-	if (self->client)
+	//pick a random number between 1 + 4
+	randNum = rand() % (4 - 1) + 1;
+	//if # = ??, do this...
+	if (randNum == 1)
+	{
+		rocket->movetype = MOVETYPE_BOUNCE; //WAS ORIGINALLY _FLYMISSILE
+		rocket->clipmask = MASK_PLAYERSOLID;
+		rocket->solid = SOLID_BBOX;
+		rocket->s.effects = 0;
+		VectorCopy(playerMin, rocket->mins);
+		VectorCopy(playerMax, rocket->maxs);
+		rocket->model = "players/male/tris.md2";
+		rocket->s.modelindex = 255; //changing the gender???
+		rocket->owner = self;
+		rocket->touch = rocket_touch;
+		rocket->nextthink = level.time + 8000/speed;
+		rocket->think = G_FreeEdict;
+		rocket->dmg = damage;
+		rocket->radius_dmg = radius_damage;
+		rocket->dmg_radius = damage_radius;
+		rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
+		rocket->classname = "rocket";
+	}
+	else if (randNum == 2)
+	{
+		rocket->movetype = MOVETYPE_BOUNCE;
+		rocket->clipmask = MASK_SHOT;
+		rocket->solid = SOLID_BBOX;
+		rocket->s.effects = 0;
+		rocket->s.renderfx = RF_GLOW;
+		VectorClear (rocket->mins);
+		VectorClear (rocket->maxs);
+		rocket->s.modelindex = gi.modelindex("models/items/armor/body/tris.md2"); //will change to players/female/tris.md2 if possible
+		rocket->owner = self;
+		rocket->touch = rocket_touch;
+		rocket->nextthink = level.time + 8000/speed;
+		rocket->think = G_FreeEdict;
+		rocket->dmg = damage;
+		rocket->radius_dmg = radius_damage;
+		rocket->dmg_radius = damage_radius;
+		rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
+		rocket->classname = "rocket";
+	}
+	else if (randNum == 3)
+	{
+		rocket->movetype = MOVETYPE_BOUNCE;
+		rocket->clipmask = MASK_SHOT;
+		rocket->solid = SOLID_BBOX;
+		rocket->s.effects = 0;
+		rocket->s.renderfx = RF_GLOW;
+		VectorClear (rocket->mins);
+		VectorClear (rocket->maxs);
+		rocket->s.modelindex = gi.modelindex("models/items/ammo/grenades/medium/tris.md2");
+		rocket->owner = self;
+		rocket->touch = rocket_touch;
+		rocket->nextthink = level.time + 8000/speed;
+		rocket->think = G_FreeEdict;
+		rocket->dmg = damage;
+		rocket->radius_dmg = radius_damage;
+		rocket->dmg_radius = damage_radius;
+		rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
+		rocket->classname = "rocket";
+	}
+	else
+	{
+		rocket->movetype = MOVETYPE_BOUNCE;
+		rocket->clipmask = MASK_SHOT;
+		rocket->solid = SOLID_BBOX;
+		rocket->s.effects = 0;
+		rocket->s.renderfx = RF_GLOW;
+		VectorClear (rocket->mins);
+		VectorClear (rocket->maxs);
+		rocket->s.modelindex = gi.modelindex("models/items/armor/jacket/tris.md2");
+		rocket->owner = self;
+		rocket->touch = rocket_touch;
+		rocket->nextthink = level.time + 8000/speed;
+		rocket->think = G_FreeEdict;
+		rocket->dmg = damage;
+		rocket->radius_dmg = radius_damage;
+		rocket->dmg_radius = damage_radius;
+		rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
+		rocket->classname = "rocket";
+	}
+	if (self->client) //WHAT IS THIS?
 		check_dodge (self, rocket->s.origin, dir, speed);
 
 	gi.linkentity (rocket);

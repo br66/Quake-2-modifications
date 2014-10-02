@@ -483,7 +483,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 {
 	int		n;
 
-	VectorClear (self->avelocity);
+	VectorClear (self->avelocity); //does this push the player?
 
 	self->takedamage = DAMAGE_YES;
 	self->movetype = MOVETYPE_TOSS;
@@ -496,7 +496,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	self->s.sound = 0;
 	self->client->weapon_sound = 0;
 
-	self->maxs[2] = -8;
+	self->maxs[2] = -8;//max size of bounding box??
 
 //	self->solid = SOLID_NOT;
 	self->svflags |= SVF_DEADMONSTER;

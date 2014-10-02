@@ -683,7 +683,7 @@ void SV_Physics_Toss (edict_t *ent)
 
 // add gravity
 	if (ent->movetype != MOVETYPE_FLY
-	&& ent->movetype != MOVETYPE_FLYMISSILE)
+	&& ent->movetype != MOVETYPE_FLYMISSILE) //BECAUSE OF THIS, IF FLYING OR YOU ARE A MISSLE, GRAVITY CANNOT AFFECT YOU
 		SV_AddGravity (ent);
 
 // move angles
