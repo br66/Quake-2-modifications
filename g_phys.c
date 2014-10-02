@@ -697,7 +697,9 @@ void SV_Physics_Toss (edict_t *ent)
 
 	if (trace.fraction < 1)
 	{
-		if (ent->movetype == MOVETYPE_BOUNCE)
+		if (ent->movetype == MOVETYPE_DODGEBALL)
+			backoff = 1.3;
+		else if (ent->movetype == MOVETYPE_BOUNCE)
 			backoff = 1.5;
 		else
 			backoff = 1;
@@ -707,7 +709,7 @@ void SV_Physics_Toss (edict_t *ent)
 	// stop if on ground
 		if (trace.plane.normal[2] > 0.7)
 		{		
-			if (ent->velocity[2] < 60 || ent->movetype != MOVETYPE_BOUNCE )
+			if (ent->velocity[2] < 60 || ent->movetype != MOVETYPE_BOUNCE && ent->movetype != MOVETYPE_DODGEBALL) //???
 			{
 				ent->groundentity = trace.ent;
 				ent->groundentity_linkcount = trace.ent->linkcount;
@@ -934,6 +936,7 @@ void G_RunEntity (edict_t *ent)
 	case MOVETYPE_BOUNCE:
 	case MOVETYPE_FLY:
 	case MOVETYPE_FLYMISSILE:
+	case MOVETYPE_DODGEBALL:
 		SV_Physics_Toss (ent);
 		break;
 	default:

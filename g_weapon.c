@@ -581,15 +581,16 @@ static void itemCreator (edict_t *ent, char *classname) //NEW ------------------
 	G_FreeEdict(ent);	// WE DO NOT NEED THE ENTITY THAT CALLED THIS FUNCTION ANYMORE, IT SHOULD BE REMOVED FROM THE WORLD TO MAKE
 						// TO MAKE SPACE FOR OTHER ENTITIES
 	//FINISHED
+	//BUT TO AVOID NO FREE EDICTS MUST REMOVE IT AFTER A WHILE
 	//-----------------------------------------------------------------------------------------
 }
-
+//--NAME CHANGE
 static void Grenade_To_Ammo (edict_t *ent) //REMOVED OLD CODE, REPLACED W/ CODE RIGHT ABOVE
 {
 	itemCreator(ent, "ammo_grenades");
 }
 
-
+//--NAME CHANGE
 static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
 	if (other == ent->owner)//this may be where i code something that would add ammo to player
@@ -625,7 +626,7 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	ent->enemy = other;
 	Grenade_Explode (ent);
 }
-
+//--NAME CHANGE
 void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius)
 {
 	edict_t	*grenade;
@@ -635,13 +636,13 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	vectoangles (aimdir, dir);
 	AngleVectors (dir, forward, right, up);
 
-	grenade = G_Spawn(); //effectively create the grenade object
+	grenade = G_Spawn(); //grenade (pointer) is now in world, but at this point not visible to eye 
 	VectorCopy (start, grenade->s.origin);
 	VectorScale (aimdir, speed, grenade->velocity);
 	VectorMA (grenade->velocity, 200 + crandom() * 10.0, up, grenade->velocity);
 	VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
 	VectorSet (grenade->avelocity, 300, 300, 300);
-	grenade->movetype = MOVETYPE_BOUNCE;
+	grenade->movetype = MOVETYPE_DODGEBALL;
 	grenade->clipmask = MASK_SHOT;
 	grenade->solid = SOLID_BBOX;
 	grenade->s.effects |= EF_GRENADE;
@@ -650,7 +651,7 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	grenade->s.modelindex = gi.modelindex ("models/objects/grenade/tris.md2");
 	grenade->owner = self;
 	grenade->touch = Grenade_Touch;
-	grenade->nextthink = level.time + timer; //HOW DOES IT KNOW TO GO TO THINK
+	grenade->nextthink = level.time + timer;
 	grenade->think = Grenade_To_Ammo;
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
@@ -658,7 +659,7 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 
 	gi.linkentity (grenade);
 }
-
+//--NAME CHANGE
 void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius, qboolean held)
 {
 	edict_t	*grenade;
@@ -702,7 +703,7 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 		gi.linkentity (grenade);
 	}
 }
-
+//--NAME CHANGE
 void Fire_Homing_Grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float damage_radius)
 {
   edict_t *grenade;
@@ -740,12 +741,12 @@ void Fire_Homing_Grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage
   gi.linkentity(grenade);
 }
 
-
+//--NAME CHANGE
 /*
 =================
 fire_rocket
 =================
-*/
+*///--NAME CHANGE
 void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
 	vec3_t		origin;
@@ -808,6 +809,7 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 	//G_FreeEdict (ent);
 }
 
+//--NAME CHANGE
 void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage)
 {
 	edict_t	*rocket;
@@ -819,20 +821,22 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	rocket = G_Spawn();
 	VectorCopy (start, rocket->s.origin);
 	VectorCopy (dir, rocket->movedir);
-	vectoangles (dir, rocket->s.angles);
+	//vectoangles (dir, rocket->s.angles); // *gets rid of this stop spawning decoys on an angle*
 	VectorScale (dir, speed, rocket->velocity);
 	//pick a random number between 1 + 4
 	randNum = rand() % (4 - 1) + 1;
 	//if # = ??, do this...
 	if (randNum == 1)
 	{
-		rocket->movetype = MOVETYPE_BOUNCE; //WAS ORIGINALLY _FLYMISSILE
-		rocket->clipmask = MASK_PLAYERSOLID;
+		rocket->movetype = MOVETYPE_TOSS; //WAS ORIGINALLY _FLYMISSILE
+		rocket->clipmask = MASK_SHOT;
 		rocket->solid = SOLID_BBOX;
 		rocket->s.effects = 0;
 		VectorCopy(playerMin, rocket->mins);
 		VectorCopy(playerMax, rocket->maxs);
-		rocket->model = "players/male/tris.md2";
+		//VectorClear (rocket->mins);
+		//VectorClear (rocket->maxs);
+		rocket->model = "players/male/tris.md2"; //says male but it's female! there's no female folder in the .pak files either
 		rocket->s.modelindex = 255; //changing the gender???
 		rocket->owner = self;
 		rocket->touch = rocket_touch;
@@ -841,7 +845,7 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 		rocket->dmg = damage;
 		rocket->radius_dmg = radius_damage;
 		rocket->dmg_radius = damage_radius;
-		rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
+		//rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
 		rocket->classname = "rocket";
 	}
 	else if (randNum == 2)
@@ -861,7 +865,7 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 		rocket->dmg = damage;
 		rocket->radius_dmg = radius_damage;
 		rocket->dmg_radius = damage_radius;
-		rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
+		//rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
 		rocket->classname = "rocket";
 	}
 	else if (randNum == 3)
@@ -881,7 +885,7 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 		rocket->dmg = damage;
 		rocket->radius_dmg = radius_damage;
 		rocket->dmg_radius = damage_radius;
-		rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
+		//rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
 		rocket->classname = "rocket";
 	}
 	else
@@ -901,11 +905,11 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 		rocket->dmg = damage;
 		rocket->radius_dmg = radius_damage;
 		rocket->dmg_radius = damage_radius;
-		rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
+		//rocket->s.sound = gi.soundindex ("weapons/rockfly.wav");
 		rocket->classname = "rocket";
 	}
-	if (self->client) //WHAT IS THIS?
-		check_dodge (self, rocket->s.origin, dir, speed);
+	if (self->client) //WHAT IS THIS? IF THE ROCKET HAS A CLIENT?
+		check_dodge (self, rocket->s.origin, dir, speed); 
 
 	gi.linkentity (rocket);
 }

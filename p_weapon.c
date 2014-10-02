@@ -545,8 +545,8 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 
 	timer = ent->client->grenade_time - level.time;
 	speed = GRENADE_MINSPEED + (ALT_GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / ALT_GRENADE_TIMER); //CHANGED
-	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held);
-	//Fire_Homing_Grenade (ent, start, forward, damage, speed, radius);
+	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held); //--NAME CHANGE
+	//Fire_Homing_Grenade (ent, start, forward, damage, speed, radius); //--NAME CHANGE
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
 		ent->client->pers.inventory[ent->client->ammo_index]--;
@@ -697,6 +697,9 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	int		damage = 120;
 	float	radius;
 
+	float	timer;
+	int		speed;
+
 	radius = damage+40;
 	if (is_quad)
 		damage *= 4;
@@ -708,7 +711,9 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_grenade (ent, start, forward, damage, 600, 9.5, radius); //CHANGING THE TIMER FROM 2.5 TO 9.5
+	//speed = GRENADE_MINSPEED + (ALT_GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / ALT_GRENADE_TIMER); //CHANGED
+
+	fire_grenade (ent, start, forward, damage, 600, 9.5, radius); //CHANGING THE TIMER FROM 2.5 TO 9.5, speed 600
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);

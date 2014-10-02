@@ -534,6 +534,8 @@ void T_RadiusDamage (edict_t *inflictor, edict_t *attacker, float damage, edict_
 
 	while ((ent = findradius(ent, inflictor->s.origin, radius)) != NULL)
 	{
+		if (ent == attacker)//??
+			return;
 		if (ent == ignore)
 			continue;
 		if (!ent->takedamage)
