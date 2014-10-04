@@ -447,7 +447,7 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			gi.sound(targ, CHAN_ITEM, gi.soundindex("items/protect4.wav"), 1, ATTN_NORM, 0);
 			targ->pain_debounce_time = level.time + 2;
 		}
-		take = 0;
+		take = 0; //don't take damage???
 		save = damage;
 	}
 

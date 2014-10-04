@@ -759,7 +759,7 @@ void G_SetClientEffects (edict_t *ent)
 	{
 		remaining = ent->client->invincible_framenum - level.framenum;
 		if (remaining > 30 || (remaining & 4) )
-			ent->s.effects |= EF_PENT;
+			ent->s.effects |= EF_PENT; //effects on player presumably
 	}
 
 	// show cheaters!!!

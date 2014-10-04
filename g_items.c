@@ -389,6 +389,21 @@ void	Use_Invulnerability (edict_t *ent, gitem_t *item)
 
 //======================================================================
 
+void	Use_MoonGravity (edict_t *ent, gitem_t *item) //NEW
+{
+	ent->client->pers.inventory[ITEM_INDEX(item)]--;
+	ValidateSelectedItem (ent);
+
+	if (ent->client->invincible_framenum > level.framenum)
+		ent->client->invincible_framenum += 300;
+	else
+		ent->client->invincible_framenum = level.framenum + 300;
+
+	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
+}
+
+//=======================================================================
+
 void	Use_Silencer (edict_t *ent, gitem_t *item)
 {
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
@@ -1852,6 +1867,29 @@ gives +1 to maximum health
 /* precache */ ""
 	},
 
+/*QUAKED item_moongravity (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"item_moongravity",
+		Pickup_Powerup, //???
+		Use_MoonGravity, //???
+		Drop_General, //???
+		NULL, //???
+		"items/pkup.wav",
+		"models/items/invulner/tris.md2", EF_ROTATE,
+		NULL, //???
+/* icon */		"p_invulnerability", //???
+/* pickup */	"Moon Gravity", //???
+/* width */		2,
+		300,
+		NULL,
+		IT_POWERUP, //IT_MOON
+		0,
+		NULL,
+		0,
+/* precache */ "items/protect.wav items/protect2.wav items/protect4.wav"
+	},
+
 	//
 	// KEYS
 	//
@@ -2163,8 +2201,6 @@ void SP_item_health_mega (edict_t *self)
 	self->style = HEALTH_IGNORE_MAX|HEALTH_TIMED;
 
 
-/*QUAKED world_ammo_grenades (.3 .3 1) (-16 -16 -16) (16 16 16)
-*/
 }
 
 

@@ -587,7 +587,7 @@ static void itemCreator (edict_t *ent, char *classname) //NEW ------------------
 //--NAME CHANGE
 static void Grenade_To_Ammo (edict_t *ent) //REMOVED OLD CODE, REPLACED W/ CODE RIGHT ABOVE
 {
-	itemCreator(ent, "ammo_grenades");
+	itemCreator(ent, "item_invulnerability");
 }
 
 //--NAME CHANGE
@@ -1043,28 +1043,31 @@ void bfg_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 	if (self->owner->client)
 		PlayerNoise(self->owner, self->s.origin, PNOISE_IMPACT);
 
-	// core explosion - prevents firing it into the wall/floor
+	// core explosion - prevents firing it into the wall/floor <<< NO NEW MOVETYPE WILL TAKE CARE OF THAT
 	if (other->takedamage)
+	{
 		T_Damage (other, self, self->owner, self->velocity, self->s.origin, plane->normal, 200, 0, 0, MOD_BFG_BLAST);
+		gi.sound (self, CHAN_VOICE, gi.soundindex ("weapons/bfg__x1b.wav"), 1, ATTN_NORM, 0);
+		//self->solid = SOLID_NOT;
+		//self->touch = NULL;
+		//VectorMA (self->s.origin, -1 * FRAMETIME, self->velocity, self->s.origin);
+		//VectorClear (self->velocity);
+		//self->s.modelindex = gi.modelindex ("sprites/s_bfg3.sp2");
+		//self->s.frame = 0;
+		//self->s.sound = 0;
+		//self->s.effects &= ~EF_ANIM_ALLFAST;
+		//self->think = bfg_explode;
+		//self->nextthink = level.time + FRAMETIME;
+		//self->enemy = other;
+	}
+	
 	T_RadiusDamage(self, self->owner, 200, other, 100, MOD_BFG_BLAST);
 
-	gi.sound (self, CHAN_VOICE, gi.soundindex ("weapons/bfg__x1b.wav"), 1, ATTN_NORM, 0);
-	self->solid = SOLID_NOT;
-	self->touch = NULL;
-	VectorMA (self->s.origin, -1 * FRAMETIME, self->velocity, self->s.origin);
-	VectorClear (self->velocity);
-	self->s.modelindex = gi.modelindex ("sprites/s_bfg3.sp2");
-	self->s.frame = 0;
-	self->s.sound = 0;
-	self->s.effects &= ~EF_ANIM_ALLFAST;
-	self->think = bfg_explode;
-	self->nextthink = level.time + FRAMETIME;
-	self->enemy = other;
-
-	gi.WriteByte (svc_temp_entity);
-	gi.WriteByte (TE_BFG_BIGEXPLOSION);
-	gi.WritePosition (self->s.origin);
-	gi.multicast (self->s.origin, MULTICAST_PVS);
+	//EXPLODE ON ANY TOUCH
+	//gi.WriteByte (svc_temp_entity);
+	//gi.WriteByte (TE_BFG_BIGEXPLOSION);
+	//gi.WritePosition (self->s.origin);
+	//gi.multicast (self->s.origin, MULTICAST_PVS);
 }
 
 
@@ -1118,7 +1121,7 @@ void bfg_think (edict_t *self)
 			if ((tr.ent->takedamage) && !(tr.ent->flags & FL_IMMUNE_LASER) && (tr.ent != self->owner))
 				T_Damage (tr.ent, self, self->owner, dir, tr.endpos, vec3_origin, dmg, 1, DAMAGE_ENERGY, MOD_BFG_LASER);
 
-			// if we hit something that's not a monster or player we're done
+			/* if we hit something that's not a monster or player we're done
 			if (!(tr.ent->svflags & SVF_MONSTER) && (!tr.ent->client))
 			{
 				gi.WriteByte (svc_temp_entity);
@@ -1129,20 +1132,21 @@ void bfg_think (edict_t *self)
 				gi.WriteByte (self->s.skinnum);
 				gi.multicast (tr.endpos, MULTICAST_PVS);
 				break;
-			}
+			}*/
 
 			ignore = tr.ent;
 			VectorCopy (tr.endpos, start);
 		}
 
-		gi.WriteByte (svc_temp_entity);
-		gi.WriteByte (TE_BFG_LASER);
-		gi.WritePosition (self->s.origin);
-		gi.WritePosition (tr.endpos);
-		gi.multicast (self->s.origin, MULTICAST_PHS);
+		//gi.WriteByte (svc_temp_entity);
+		//gi.WriteByte (TE_BFG_LASER);
+		//gi.WritePosition (self->s.origin);
+		//gi.WritePosition (tr.endpos);
+		//gi.multicast (self->s.origin, MULTICAST_PHS);
 	}
 
-	self->nextthink = level.time + FRAMETIME;
+	self->nextthink = level.time + 10.5;
+	self->think = G_FreeEdict;
 }
 
 
@@ -1153,9 +1157,9 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 	bfg = G_Spawn();
 	VectorCopy (start, bfg->s.origin);
 	VectorCopy (dir, bfg->movedir);
-	vectoangles (dir, bfg->s.angles);
+	//vectoangles (dir, bfg->s.angles);
 	VectorScale (dir, speed, bfg->velocity);
-	bfg->movetype = MOVETYPE_FLYMISSILE;
+	bfg->movetype = MOVETYPE_DBOL;
 	bfg->clipmask = MASK_SHOT;
 	bfg->solid = SOLID_BBOX;
 	bfg->s.effects |= EF_BFG | EF_ANIM_ALLFAST;
@@ -1165,13 +1169,13 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 	bfg->owner = self;
 	bfg->touch = bfg_touch;
 	bfg->nextthink = level.time + 8000/speed;
-	bfg->think = G_FreeEdict;
+	bfg->think = bfg_think;
 	bfg->radius_dmg = damage;
 	bfg->dmg_radius = damage_radius;
 	bfg->classname = "bfg blast";
 	bfg->s.sound = gi.soundindex ("weapons/bfg__l1a.wav");
 
-	bfg->think = bfg_think;
+	//bfg->think = G_FreeEdict;
 	bfg->nextthink = level.time + FRAMETIME;
 	bfg->teammaster = bfg;
 	bfg->teamchain = NULL;
