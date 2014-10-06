@@ -376,11 +376,15 @@ void Use_Envirosuit (edict_t *ent, gitem_t *item)
 
 void	Use_Invulnerability (edict_t *ent, gitem_t *item)
 {
+	//ent->flags |= FL_ANTIG;	
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
 	ValidateSelectedItem (ent);
 
 	if (ent->client->invincible_framenum > level.framenum)
+	{
 		ent->client->invincible_framenum += 300;
+		//ent->flags |= FL_ANTIG;
+	}
 	else
 		ent->client->invincible_framenum = level.framenum + 300;
 
@@ -391,14 +395,25 @@ void	Use_Invulnerability (edict_t *ent, gitem_t *item)
 
 void	Use_MoonGravity (edict_t *ent, gitem_t *item) //NEW
 {
+	sv_gravity->value = 200;
+
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
 	ValidateSelectedItem (ent);
 
-	if (ent->client->invincible_framenum > level.framenum)
-		ent->client->invincible_framenum += 300;
+	if (ent->client->moongravity_framenum > level.framenum)
+	{
+		ent->client->moongravity_framenum += 300;
+	}
 	else
-		ent->client->invincible_framenum = level.framenum + 300;
+	{
+		ent->client->moongravity_framenum = level.framenum + 300;
+	}
 
+	/*if (ent->client->ps.stats[STAT_TIMER] > 1)
+	{
+		sv_gravity->value = 800;
+	}*/
+	
 	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
 }
 
@@ -1871,15 +1886,15 @@ gives +1 to maximum health
 */
 	{
 		"item_moongravity",
-		Pickup_Powerup, //???
+		Pickup_Powerup,
 		Use_MoonGravity, //???
-		Drop_General, //???
-		NULL, //???
+		Drop_General,
+		NULL,
 		"items/pkup.wav",
 		"models/items/invulner/tris.md2", EF_ROTATE,
 		NULL, //???
-/* icon */		"p_invulnerability", //???
-/* pickup */	"Moon Gravity", //???
+/* icon */		"p_invulnerability",
+/* pickup */	"Moon Gravity",
 /* width */		2,
 		300,
 		NULL,

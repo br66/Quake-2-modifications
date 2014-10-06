@@ -27,6 +27,7 @@ void MoveClientToIntermission (edict_t *ent)
 	// clean up powerup info
 	ent->client->quad_framenum = 0;
 	ent->client->invincible_framenum = 0;
+	ent->client->moongravity_framenum = 0; //NEW
 	ent->client->breather_framenum = 0;
 	ent->client->enviro_framenum = 0;
 	ent->client->grenade_blew_up = false;
@@ -436,6 +437,19 @@ void G_SetStats (edict_t *ent)
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
 		ent->client->ps.stats[STAT_TIMER] = (ent->client->invincible_framenum - level.framenum)/10;
+	}
+	else if (ent->client->moongravity_framenum > level.framenum)
+	{
+		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
+		ent->client->ps.stats[STAT_TIMER] = (ent->client->moongravity_framenum - level.framenum)/10;
+		gi.cprintf(ent, PRINT_HIGH, "%d\n", ent->client->ps.stats[STAT_TIMER]);
+	}
+	else if (ent->client->moongravity_framenum < level.framenum)
+	{
+		sv_gravity->value = 800; 
+		
+		// I REALLY didn't want to have to put this here; it makes the code unorganized.
+		// Unlike, the Use Moon Gravity function, this one is called every frame.
 	}
 	else if (ent->client->enviro_framenum > level.framenum)
 	{

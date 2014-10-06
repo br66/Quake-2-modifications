@@ -587,7 +587,7 @@ static void itemCreator (edict_t *ent, char *classname) //NEW ------------------
 //--NAME CHANGE
 static void Grenade_To_Ammo (edict_t *ent) //REMOVED OLD CODE, REPLACED W/ CODE RIGHT ABOVE
 {
-	itemCreator(ent, "item_invulnerability");
+	itemCreator(ent, "item_moongravity");
 }
 
 //--NAME CHANGE
