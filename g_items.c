@@ -400,19 +400,36 @@ void	Use_MoonGravity (edict_t *ent, gitem_t *item) //NEW
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
 	ValidateSelectedItem (ent);
 
-	//if (ent->client->moongravity_framenum > level.framenum)
-	//{
-		//ent->client->moongravity_framenum += 300;
-	//}
-	//else
-	//{
-		//ent->client->moongravity_framenum = level.framenum + 300;
-	//}
-
-	/*if (ent->client->ps.stats[STAT_TIMER] > 1)
+	if (ent->client->moongravity_framenum > level.framenum)
 	{
-		sv_gravity->value = 800;
-	}*/
+		ent->client->moongravity_framenum += 300;
+	}
+	else
+	{
+		ent->client->moongravity_framenum = level.framenum + 300;
+	}
+	
+	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
+}
+
+void	Use_IncSpeed (edict_t *ent, gitem_t *item) //NEW
+{
+	//ent->speed = 5000; 
+	//ent->moveinfo.speed = 5000;
+	//ent->moveinfo.move_speed = 5000;
+	//sv_maxvelocity->value = 100;
+
+	ent->client->pers.inventory[ITEM_INDEX(item)]--;
+	ValidateSelectedItem (ent);
+
+	if (ent->client->moongravity_framenum > level.framenum)
+	{
+		ent->client->moongravity_framenum += 300;
+	}
+	else
+	{
+		ent->client->moongravity_framenum = level.framenum + 300;
+	}
 	
 	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
 }
@@ -1910,14 +1927,14 @@ gives +1 to maximum health
 	{
 		"item_incspeed",
 		Pickup_Powerup, //WARNING CHANGE TO PICKUP FUNCTION COMPLETELY REMOVE SETRESPAWN
-		Use_MoonGravity, //???
+		Use_IncSpeed, //???
 		Drop_General,
 		NULL,
 		"items/pkup.wav",
 		"models/items/invulner/tris.md2", EF_ROTATE,
 		NULL, //???
 /* icon */		"p_invulnerability",
-/* pickup */	"Moon Gravity",
+/* pickup */	"TEST",
 /* width */		2,
 		300, //CHANGE THIS NUMBER
 		NULL,

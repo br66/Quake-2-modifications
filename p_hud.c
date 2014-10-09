@@ -362,6 +362,8 @@ void G_SetStats (edict_t *ent)
 	int			index, cells;
 	int			power_armor_type;
 
+	gi.cprintf(ent, PRINT_HIGH, "%d\n", VectorLength(ent->velocity));
+
 	//
 	// health
 	//
@@ -442,7 +444,7 @@ void G_SetStats (edict_t *ent)
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
 		ent->client->ps.stats[STAT_TIMER] = (ent->client->moongravity_framenum - level.framenum)/10;
-		gi.cprintf(ent, PRINT_HIGH, "%d\n", ent->client->ps.stats[STAT_TIMER]);
+		gi.cprintf(ent, PRINT_HIGH, "%d\n", VectorLength(ent->velocity));
 	}
 	else if (ent->client->moongravity_framenum < level.framenum)
 	{

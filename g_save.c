@@ -141,7 +141,7 @@ void InitGame (void)
 	//FIXME: sv_ prefix is wrong for these
 	sv_rollspeed = gi.cvar ("sv_rollspeed", "200", 0);
 	sv_rollangle = gi.cvar ("sv_rollangle", "2", 0);
-	sv_maxvelocity = gi.cvar ("sv_maxvelocity", "2000", 0);
+	sv_maxvelocity = gi.cvar ("sv_maxvelocity", "2000", 0); //orig 2000
 	sv_gravity = gi.cvar ("sv_gravity", "800", 0);
 
 	// noset vars
@@ -170,7 +170,7 @@ void InitGame (void)
 
 	g_select_empty = gi.cvar ("g_select_empty", "0", CVAR_ARCHIVE);
 
-	run_pitch = gi.cvar ("run_pitch", "0.002", 0);
+	run_pitch = gi.cvar ("run_pitch", "0.002", 0); //??
 	run_roll = gi.cvar ("run_roll", "0.005", 0);
 	bob_up  = gi.cvar ("bob_up", "0.005", 0);
 	bob_pitch = gi.cvar ("bob_pitch", "0.002", 0);

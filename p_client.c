@@ -1685,7 +1685,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 		for (i=0 ; i<3 ; i++)
 		{
-			pm.s.origin[i] = ent->s.origin[i]*8;
+			pm.s.origin[i] = ent->s.origin[i]*8; //8
 			pm.s.velocity[i] = ent->velocity[i]*8;
 		}
 
@@ -1710,7 +1710,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		for (i=0 ; i<3 ; i++)
 		{
 			ent->s.origin[i] = pm.s.origin[i]*0.125;
-			ent->velocity[i] = pm.s.velocity[i]*0.125;
+			ent->velocity[i] = pm.s.velocity[i]*0.125; //0.125
 		}
 
 		VectorCopy (pm.mins, ent->mins);
@@ -1818,6 +1818,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	//think slowly
 	//gi.centerprintf(
 }
+
 
 
 /*
