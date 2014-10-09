@@ -155,7 +155,80 @@ void SP_info_player_intermission(void)
 
 
 //=======================================================================
+/*
+==================
+player_playdead NEW
+==================
+*/
 
+void player_playdead (edict_t *self) //SCRAPPED
+{
+int		n;
+
+	VectorClear (self->avelocity); //does this push the player?
+
+	self->takedamage = DAMAGE_YES;
+	self->movetype = MOVETYPE_TOSS;
+
+	self->s.modelindex2 = 0;	// remove linked weapon model
+
+	self->s.angles[0] = 0;
+	self->s.angles[2] = 0;
+
+	self->s.sound = 0;
+	self->client->weapon_sound = 0;
+
+	self->maxs[2] = -8;//max size of bounding box??
+
+	self->svflags |= SVF_DEADMONSTER;
+
+	if (!self->deadflag)
+	{
+		self->client->respawn_time = level.time + 1.0;
+		self->client->ps.pmove.pm_type = PM_DEAD;
+		if (deathmatch->value)
+			Cmd_Help_f (self);		// show scores
+
+		// clear inventory
+		// this is kind of ugly, but it's how we want to handle keys in coop
+		for (n = 0; n < game.num_items; n++)
+		{
+			if (coop->value && itemlist[n].flags & IT_KEY)
+				self->client->resp.coop_respawn.inventory[n] = self->client->pers.inventory[n];
+			self->client->pers.inventory[n] = 0;
+		}
+	}
+
+	if (!self->deadflag)
+		{
+			static int i;
+
+			i = (i+1)%3;
+			// start a death animation
+			self->client->anim_priority = ANIM_DEATH;
+			if (self->client->ps.pmove.pm_flags & PMF_DUCKED)
+			{
+				self->s.frame = FRAME_crdeath1-1;
+				self->client->anim_end = FRAME_crdeath5;
+			}
+			else switch (i)
+			{
+			case 0:
+				self->s.frame = FRAME_death101-1;
+				self->client->anim_end = FRAME_death106;
+				break;
+			case 1:
+				self->s.frame = FRAME_death201-1;
+				self->client->anim_end = FRAME_death206;
+				break;
+			case 2:
+				self->s.frame = FRAME_death301-1;
+				self->client->anim_end = FRAME_death308;
+				break;
+			}
+			gi.sound (self, CHAN_VOICE, gi.soundindex(va("*death%i.wav", (rand()%4)+1)), 1, ATTN_NORM, 0);
+		}
+}
 
 void player_pain (edict_t *self, edict_t *other, float kick, int damage)
 {
@@ -1144,6 +1217,7 @@ void PutClientInServer (edict_t *ent)
 	// clear entity values
 	ent->groundentity = NULL;
 	ent->client = &game.clients[index];
+	ent->client->playing_dead = 0;
 	ent->takedamage = DAMAGE_AIM;
 	ent->movetype = MOVETYPE_WALK;
 	ent->viewheight = 22;
@@ -1157,6 +1231,7 @@ void PutClientInServer (edict_t *ent)
 	ent->model = "players/male/tris.md2";
 	ent->pain = player_pain;
 	ent->die = player_die;
+	ent->fake = player_playdead; //NEW
 	ent->waterlevel = 0;
 	ent->watertype = 0;
 	ent->flags &= ~FL_NO_KNOCKBACK;

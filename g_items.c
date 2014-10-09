@@ -121,7 +121,7 @@ void DoRespawn (edict_t *ent)
 	gi.linkentity (ent);
 
 	// send an effect
-	ent->s.event = EV_ITEM_RESPAWN; //this may actually be special effects
+	ent->s.event = EV_ITEM_RESPAWN; //this may actually be special effects -- OLD COMMENT DELETE THIS
 }
 
 void SetRespawn (edict_t *ent, float delay)
@@ -152,7 +152,7 @@ qboolean Pickup_Powerup (edict_t *ent, edict_t *other)
 
 	if (deathmatch->value)
 	{
-		if (!(ent->spawnflags & DROPPED_ITEM) )
+		if (!(ent->spawnflags & DROPPED_ITEM) ) 
 			SetRespawn (ent, ent->item->quantity);
 		if (((int)dmflags->value & DF_INSTANT_ITEMS) || ((ent->item->use == Use_Quad) && (ent->spawnflags & DROPPED_PLAYER_ITEM)))
 		{
@@ -400,14 +400,14 @@ void	Use_MoonGravity (edict_t *ent, gitem_t *item) //NEW
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
 	ValidateSelectedItem (ent);
 
-	if (ent->client->moongravity_framenum > level.framenum)
-	{
-		ent->client->moongravity_framenum += 300;
-	}
-	else
-	{
-		ent->client->moongravity_framenum = level.framenum + 300;
-	}
+	//if (ent->client->moongravity_framenum > level.framenum)
+	//{
+		//ent->client->moongravity_framenum += 300;
+	//}
+	//else
+	//{
+		//ent->client->moongravity_framenum = level.framenum + 300;
+	//}
 
 	/*if (ent->client->ps.stats[STAT_TIMER] > 1)
 	{
@@ -824,7 +824,7 @@ void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 
 	if (!((coop->value) &&  (ent->item->flags & IT_STAY_COOP)) || (ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)))
 	{
-		if (ent->flags & FL_RESPAWN)
+		if (ent->flags & FL_RESPAWN) //item respawn?
 			ent->flags &= ~FL_RESPAWN;
 		else
 			G_FreeEdict (ent);
@@ -1886,7 +1886,7 @@ gives +1 to maximum health
 */
 	{
 		"item_moongravity",
-		Pickup_Powerup,
+		Pickup_Powerup, //WARNING CHANGE TO PICKUP FUNCTION COMPLETELY REMOVE SETRESPAWN
 		Use_MoonGravity, //???
 		Drop_General,
 		NULL,
@@ -1897,6 +1897,29 @@ gives +1 to maximum health
 /* pickup */	"Moon Gravity",
 /* width */		2,
 		300,
+		NULL,
+		IT_POWERUP, //IT_MOON
+		0,
+		NULL,
+		0,
+/* precache */ "items/protect.wav items/protect2.wav items/protect4.wav"
+	},
+
+/*QUAKED item_increasespeed (.3 .3 1) (-16 -16 -16) (16 16 16)
+*/
+	{
+		"item_incspeed",
+		Pickup_Powerup, //WARNING CHANGE TO PICKUP FUNCTION COMPLETELY REMOVE SETRESPAWN
+		Use_MoonGravity, //???
+		Drop_General,
+		NULL,
+		"items/pkup.wav",
+		"models/items/invulner/tris.md2", EF_ROTATE,
+		NULL, //???
+/* icon */		"p_invulnerability",
+/* pickup */	"Moon Gravity",
+/* width */		2,
+		300, //CHANGE THIS NUMBER
 		NULL,
 		IT_POWERUP, //IT_MOON
 		0,

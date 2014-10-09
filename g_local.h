@@ -638,6 +638,7 @@ void vectoangles (vec3_t vec, vec3_t angles);
 qboolean OnSameTeam (edict_t *ent1, edict_t *ent2);
 qboolean CanDamage (edict_t *targ, edict_t *inflictor);
 void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir, vec3_t point, vec3_t normal, int damage, int knockback, int dflags, int mod);
+void Q_DodgeRight (edict_t *ent, int knockback); //NEW
 void T_RadiusDamage (edict_t *inflictor, edict_t *attacker, float damage, edict_t *ignore, float radius, int mod);
 
 // damage flags
@@ -741,10 +742,11 @@ void InitBodyQue (void);
 void ClientBeginServerFrame (edict_t *ent);
 
 //
-// g_player.c
+// p_client.c g_player.c
 //
 void player_pain (edict_t *self, edict_t *other, float kick, int damage);
 void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
+void player_playdead (edict_t *ent); //NEW
 
 //
 // g_svcmds.c
@@ -945,7 +947,8 @@ struct gclient_s
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
-	//int thinkdelay
+	
+	int			playing_dead;		// NEW playing dead switch
 };
 
 
@@ -1031,6 +1034,7 @@ struct edict_s
 	void		(*use)(edict_t *self, edict_t *other, edict_t *activator);
 	void		(*pain)(edict_t *self, edict_t *other, float kick, int damage);
 	void		(*die)(edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
+	void		(*fake)(edict_t *self); //NEW
 
 	float		touch_debounce_time;		// are all these legit?  do we need more/less of them?
 	float		pain_debounce_time;
