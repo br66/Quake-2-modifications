@@ -838,6 +838,8 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 		//VectorClear (rocket->maxs);
 		rocket->model = "players/male/tris.md2"; //says male but it's female! there's no female folder in the .pak files either
 		rocket->s.modelindex = 255; //changing the gender???
+		//rocket->s.effects |= EF_COLOR_SHELL;
+		//rocket->s.renderfx |= RF_SHELL_GREEN;
 		rocket->owner = self;
 		rocket->touch = rocket_touch;
 		rocket->nextthink = level.time + 8000/speed;

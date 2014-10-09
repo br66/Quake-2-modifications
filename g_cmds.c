@@ -2,6 +2,85 @@
 #include "m_player.h"
 
 
+
+
+static void itemCreator (edict_t *ent, char *classname) //NEW ----------------------------------------------------------
+{
+	//NEW FUNCTION: ITEM CREATOR - PRETTY SELF-EXPLANATORY, CREATES ITEM BASED ON CLASSNAME GIVEN IN
+	//SECOND PARAMETER (char *classname)
+
+	gitem_t	*item;			//whatever classname given will be attached to this item pointer
+	edict_t	*entityItem;	//the item's classname will be given to the entity
+	vec3_t	angles;			//to create rotation effect
+
+	// 1. GET THE CLASSNAME THAT WAS ASKED FOR WHEN THE FUNCTION WAS CALLED
+	
+	item = FindItemByClassname(classname); //should this be &classname????
+	if(!item) //if item pointer points to something that does not exist, it is a null pointer; don't do shit
+		return;
+	//---------------------------------------------------------------------------------------
+
+	// 2. WILL SPAWN "entityItem", BUT IT WILL NOT SHOW UP AT FIRST BECAUSE WE HAVEN'T GIVEN THE ENTITY ANY SPECIAL
+	// EFFECTS, MODEL, CLASSNAME, POSITION, SIZE, OR EVEN TOLD IT THAT IT'S SOLID YET
+
+	entityItem = G_Spawn();
+	//----------------------------------------------------------------------------------------
+
+	// 3. "entityItem" IS WHERE WE WILL STORE THE INFORMATION THAT WILL MAKE IT AN ENTITY WITH ITEM PROPERTIES
+	// I WILL NOW GIVE IT THOSE PROPERTIES, REMEMBER THESE PROPERTIES WILL VARY DEPENDING ON THE CLASSNAME GIVEN
+
+	entityItem->item = item;	//AN ENTITY CAN BE ALMOST ANYTHING.  THE ENTITY DICTIONARY STRUCTURE HAS AN ATTRIBUTE
+								//FOR ITEMS, WE WILL USE IT AND MAKE IT EQUAL TO THE CLASSNAME OF THE ITEM THAT WAS GIVEN
+	//-----------------------------------------------------------------------------------------
+
+	// 4. IT IS NOW AN ITEM ENTITY, NOW I WILL GIVE THE BEHAVIOR OF AN ITEM
+	//  4.1 IT WILL APPEAR APPROXIMATELY THE SAME PLACE AS THE ENTITY THAT CALLED THIS FUNCTION -------
+
+	VectorCopy (ent->s.origin, entityItem->s.origin);	//COPYING THE POSITION OF ENTITY THAT CALLED THIS FUNCTION
+														//"s.origin" IS A VECTOR (x, y, z) a.k.a. WHERE THE OBJECT WILL BE POSITIONED
+
+	entityItem->s.origin[2] += 15;	// FOR SOME REASON, THE Z OF THE OBJECT (s.origin[2] IS THE Z) MUST BE BROUGHT UP
+									// A LITTLE BIT, OTHERWISE IT SEEMS TO APPEAR UNDER THE OBJECT AND IN THE GROUND
+	//  4.2 SIZE OF THE ENTITY?
+
+	VectorSet (entityItem->mins, -15,-15,-15); //mininmum size of item entity???
+	VectorSet(entityItem->maxs, -15,-15,-15); //maximum size of entity???
+	
+	//  4.3 SOLIDITY OF THE ENTITY
+
+	entityItem->solid = SOLID_TRIGGER; //THIS WILL MAKE THE ITEM ENTITY SOLID SO IT IS AFFECTED BY COLLISIONS
+
+	//  4.4 GIVE IT THE INSTRUCTIONS OF WHAT TO DO WHEN COLLIDED WITH
+
+	entityItem->touch = Touch_Item; //SELF-EXPLANATORY, YES?
+
+	//  4.5 3D MODEL OF THE ENTITY (YOU WILL NOW BE ABLE TO SEE THE ITEM ENTITY)
+
+	gi.setmodel(entityItem, entityItem->item->world_model); //SET ITEM ENTITY'S MODEL BY FINDING IT BY CHARACTER NAME
+															//("...world_model")
+	//  4.6 SPECIAL EFFECTS OF THE ENTITY
+
+	entityItem->s.effects = entityItem->item->world_model_flags;	//FIND MY SPECIAL EFFECTS USUALLY ATTACHED TO THIS ITEM
+	entityItem->s.renderfx = RF_GLOW;								//LIKE ALL ITEMS, GLOW
+
+	angles[0] = 0;
+    angles[1] = rand() % 360; //THIS WILL MAKE IT ROTATE ON THE Y AXIS
+    angles[2] = 0;
+
+	//  4.7 FINAL INSTRUCTIONS
+
+	gi.linkentity(entityItem); //LINK ALL THE CHANGES I MADE TO THE ITEM ENTITY TO.... THE ITEM ENTITY, IN OTHER WORDS, UPDATE IT
+	
+	G_FreeEdict(ent);	// WE DO NOT NEED THE ENTITY THAT CALLED THIS FUNCTION ANYMORE, IT SHOULD BE REMOVED FROM THE WORLD TO MAKE
+						// TO MAKE SPACE FOR OTHER ENTITIES
+	//FINISHED
+	//BUT TO AVOID NO FREE EDICTS MUST REMOVE IT AFTER A WHILE
+	//-----------------------------------------------------------------------------------------
+}
+
+
+
+
 char *ClientTeam (edict_t *ent)
 {
 	char		*p;
@@ -970,6 +1049,16 @@ void ClientCommand (edict_t *ent)
 		Cmd_PlayerList_f(ent);
 	else if (Q_stricmp (cmd, "dodgeright") == 0) //NEW
 		Q_DodgeRight(ent, 20);
+	else if (Q_stricmp (cmd, "lightspeed") == 0)
+		ent->client->grenade_flag = 2;
+	else if (Q_stricmp (cmd, "camo") == 0)
+	{
+		ent->s.effects |= EF_POWERSCREEN;
+		ent->s.renderfx |= RF_FULLBRIGHT;
+
+		//gi.centerprintf(ent, "CAMOFLAUGE");
+	}
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
+
 }

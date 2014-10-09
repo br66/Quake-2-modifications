@@ -250,6 +250,8 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 		other->client->pers.max_rockets = 100;
 	if (other->client->pers.max_grenades < 100)
 		other->client->pers.max_grenades = 100;
+	if (other->client->pers.max_lightgrenades < 100)
+		other->client->pers.max_lightgrenades = 100; //UGH
 	if (other->client->pers.max_cells < 300)
 		other->client->pers.max_cells = 300;
 	if (other->client->pers.max_slugs < 100)
@@ -289,6 +291,15 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 		other->client->pers.inventory[index] += item->quantity;
 		if (other->client->pers.inventory[index] > other->client->pers.max_grenades)
 			other->client->pers.inventory[index] = other->client->pers.max_grenades;
+	}
+
+	item = FindItem("Lightspeed Grenade");
+	if (item)
+	{
+		index = ITEM_INDEX(item);
+		other->client->pers.inventory[index] += item->quantity;
+		if (other->client->pers.inventory[index] > other->client->pers.max_lightgrenades)
+			other->client->pers.inventory[index] = other->client->pers.max_lightgrenades;
 	}
 
 	item = FindItem("Decoys");
@@ -412,7 +423,7 @@ void	Use_MoonGravity (edict_t *ent, gitem_t *item) //NEW
 	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
 }
 
-void	Use_IncSpeed (edict_t *ent, gitem_t *item) //NEW
+void	Use_IncSpeed (edict_t *ent, gitem_t *item) //SCRAPPED, CAN'T FIND PLAYER SPEED
 {
 	//ent->speed = 5000; 
 	//ent->moveinfo.speed = 5000;
@@ -488,6 +499,8 @@ qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count)
 		max = ent->client->pers.max_rockets;
 	else if (item->tag == AMMO_GRENADES)
 		max = ent->client->pers.max_grenades;
+	else if (item->tag == AMMO_LIGHTGRENADES)
+		max = ent->client->pers.max_lightgrenades; ///light greandes
 	else if (item->tag == AMMO_CELLS)
 		max = ent->client->pers.max_cells;
 	else if (item->tag == AMMO_SLUGS)
@@ -553,6 +566,15 @@ void Drop_Ammo (edict_t *ent, gitem_t *item)
 	if (ent->client->pers.weapon && 
 		ent->client->pers.weapon->tag == AMMO_GRENADES &&
 		item->tag == AMMO_GRENADES &&
+		ent->client->pers.inventory[index] - dropped->count <= 0) {
+		gi.cprintf (ent, PRINT_HIGH, "Can't drop current weapon\n");
+		G_FreeEdict(dropped);
+		return;
+	}
+
+	if (ent->client->pers.weapon && 
+		ent->client->pers.weapon->tag == AMMO_LIGHTGRENADES &&
+		item->tag == AMMO_LIGHTGRENADES &&
 		ent->client->pers.inventory[index] - dropped->count <= 0) {
 		gi.cprintf (ent, PRINT_HIGH, "Can't drop current weapon\n");
 		G_FreeEdict(dropped);

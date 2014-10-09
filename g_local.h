@@ -83,6 +83,7 @@ typedef enum
 	AMMO_SHELLS,
 	AMMO_ROCKETS,
 	AMMO_GRENADES,
+	AMMO_LIGHTGRENADES, //NEW
 	AMMO_CELLS,
 	AMMO_SLUGS
 } ammo_t;
@@ -213,6 +214,7 @@ typedef struct
 #define WEAP_HYPERBLASTER		9 
 #define WEAP_RAILGUN			10
 #define WEAP_BFG				11
+#define WEAP_LIGHTGRENADES		12 //NEW
 
 typedef struct gitem_s
 {
@@ -836,6 +838,7 @@ typedef struct
 	int			max_shells;
 	int			max_rockets;
 	int			max_grenades;
+	int			max_lightgrenades; //NEW
 	int			max_cells;
 	int			max_slugs;
 
@@ -889,6 +892,8 @@ struct gclient_s
 	qboolean	weapon_thunk;
 
 	gitem_t		*newweapon;
+
+	int			grenade_flag;
 
 	// sum up damage over an entire frame, so
 	// shotgun blasts give a single big kick
@@ -1100,5 +1105,7 @@ struct edict_s
 	// common data blocks
 	moveinfo_t		moveinfo;
 	monsterinfo_t	monsterinfo;
+
+	int			grenade_flag; //NEW
 };
 

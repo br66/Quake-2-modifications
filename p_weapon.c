@@ -545,8 +545,25 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 
 	timer = ent->client->grenade_time - level.time;
 	speed = GRENADE_MINSPEED + (ALT_GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / ALT_GRENADE_TIMER); //CHANGED
-	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held); //--NAME CHANGE
+	//fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held); //--NAME CHANGE
 	//Fire_Homing_Grenade (ent, start, forward, damage, speed, radius); //--NAME CHANGE
+
+	if (ent->client->grenade_flag == 2)
+	{
+		//ent->grenade_flag = 2;
+		speed *= 100000;
+		fire_grenade2(ent, start, forward, damage, speed += 100, timer, radius, held);
+	}
+	else
+	{
+		fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held); //--NAME CHANGE
+	}
+	//if flag = fire regular grenade
+	//if grenade_flag = 0 (firegrenade2)
+	//if flag = fire homing grenade
+	//if grenade_flag = 1 (Fire_Homing_Grenade)
+	//if flag = fire lightspeed grenade
+	//if grenade_flag = 2 (fire_grenade_lightsp)
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
 		ent->client->pers.inventory[ent->client->ammo_index]--;
@@ -680,6 +697,12 @@ void Weapon_Grenade (edict_t *ent)
 		}
 	}
 }
+
+
+
+
+
+
 
 /*
 ======================================================================
