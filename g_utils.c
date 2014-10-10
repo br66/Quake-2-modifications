@@ -423,6 +423,17 @@ edict_t *G_Spawn (void)
 	return e;
 }
 
+void G_Spawn_Splash(int type, int count, int color, vec3_t start, vec3_t origin)
+{
+	gi.WriteByte(svc_temp_entity);
+	gi.WriteByte(type);
+	gi.WriteByte(count);
+	gi.WritePosition(start);
+	//gi.WriteDir(movdir);
+	gi.WriteByte(color);
+	gi.multicast(origin, MULTICAST_PVS);
+}
+
 /*
 =================
 G_FreeEdict

@@ -1627,6 +1627,42 @@ void PrintPmove (pmove_t *pm)
 	Com_Printf ("sv %3i:%i %i\n", pm->cmd.impulse, c1, c2);
 }
 
+edict_t *highEnt = NULL;
+
+void GetHighScorer (void) //SCRAPPED FUNCTION
+{
+	int i, topscore = 0;
+	edict_t *player;
+
+	if((int)level.time%10 != 0)
+		return; //looks like it happens constantly
+
+	highEnt = NULL;
+
+	for (i = 0; i < game.maxclients; i++)
+	{
+		//gonna look through entire 'library' of player/clients that are alive
+		player = &g_edicts[i];
+		if (!player->client)
+			continue;
+		if (player->client)
+		{
+			//gi.centerprintf(player, "STABLE");
+			if (player->client->resp.score = topscore)
+			{
+				//gi.centerprintf(player, "STABLE");
+				topscore = player->client->resp.score;
+			}
+		}
+	}
+
+	if (!topscore)
+		return; //if there is no top score, return
+
+	highEnt = player;
+	//gi.centerprintf(player, "STABLE");
+}
+
 /*
 ==============
 ClientThink
@@ -1644,6 +1680,20 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 	level.current_entity = ent;
 	client = ent->client;
+
+	GetHighScorer(); //each frame and each second? souns a bit redundant
+	//gi.centerprintf(ent, "moving");
+
+	if(highEnt == ent) //if i have the high score
+	{
+		vec3_t particles;
+		VectorCopy (ent->s.origin, particles);
+		//particles[0] += 128;
+		particles[2] += 64; //move the y a little above player
+		gi.centerprintf(ent, "STABLE");
+		gi.centerprintf(highEnt, "STABLEW");
+		G_Spawn_Splash(TE_LASER_SPARKS, 8, 0xe2e5e3e6, particles, ent->s.origin);
+	}
 
 	if (level.intermissiontime)
 	{
