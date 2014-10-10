@@ -554,6 +554,11 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 		speed *= 100000;
 		fire_grenade2(ent, start, forward, damage, speed += 100, timer, radius, held);
 	}
+	else if(ent->client->grenade_flag == 3)
+	{
+		fire_grenadeprox(ent, start, forward, damage, speed, timer, radius, held);
+		gi.centerprintf(ent, "PROX");
+	}
 	else
 	{
 		fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held); //--NAME CHANGE

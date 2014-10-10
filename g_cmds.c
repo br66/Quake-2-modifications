@@ -1050,13 +1050,21 @@ void ClientCommand (edict_t *ent)
 	else if (Q_stricmp (cmd, "dodgeright") == 0) //NEW
 		Q_DodgeRight(ent, 20);
 	else if (Q_stricmp (cmd, "lightspeed") == 0)
+	{
 		ent->client->grenade_flag = 2;
+		gi.centerprintf(ent, "GRENADE FLAG 2");
+	}
 	else if (Q_stricmp (cmd, "camo") == 0)
 	{
 		ent->s.effects |= EF_POWERSCREEN;
 		ent->s.renderfx |= RF_FULLBRIGHT;
 
 		//gi.centerprintf(ent, "CAMOFLAUGE");
+	}
+	else if (Q_stricmp (cmd, "proximity") == 0)
+	{
+		ent->client->grenade_flag = 3;
+		gi.centerprintf(ent, "GRENADE FLAG 3");
 	}
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);

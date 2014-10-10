@@ -510,6 +510,41 @@ void Homing_Think (edict_t *grenade)
 }
 //----------------------------------------------------------------------------------------------------------------------
 
+static void Grenade_Proxim_Think (edict_t *ent)
+{
+	edict_t *blip = NULL;
+
+	if (level.time > ent->delay) //if i have reached end of life
+	{
+		G_FreeEdict(ent); //go bye bye
+	}
+
+	ent->think = Grenade_Proxim_Think; //reset our think to check above statement again
+
+	while ((blip = findradius(blip, ent->s.origin, 100)) != NULL)
+	{
+		if (!(blip->svflags & SVF_MONSTER) && !blip->client)
+			continue; //if not a monster and not a player
+		if (blip == ent->owner)
+			continue; //if i am within the radius of the mine
+		if (!blip->takedamage)
+			continue; //if whatever i hit can't take dmg
+		if (blip->health <= 0)
+			continue; //if whatever i hit as no health
+		if (!visible(ent, blip))
+			continue; //if whatever i hit is not visible to the grenade
+		
+		/*if (blip->client)
+		{
+			//gi.centerprintf(blip, "COLLISION W/ PLAYER"); successful test of while loop working
+		}*/
+
+		ent->think = Grenade_Explode; //in any other instance, explode
+		break; //break out of while loop
+	}
+	ent->nextthink = level.time + .1; //in any other instance call function again to check
+}
+//----------------------------------------------------------------------------------------------------------------------
 
 static void itemCreator (edict_t *ent, char *classname) //NEW ----------------------------------------------------------
 {
@@ -619,12 +654,14 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 		else
 		{
 			gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/grenlb1b.wav"), 1, ATTN_NORM, 0);
+
+			//if (
 		}
 		return;
 	}
 
 	ent->enemy = other;
-	Grenade_Explode (ent);
+	//Grenade_Explode (ent);
 }
 //--NAME CHANGE
 void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius)
@@ -739,6 +776,51 @@ void Fire_Homing_Grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage
   grenade->nextthink = level.time + 10.0;
   grenade->think = Grenade_Explode;
   gi.linkentity(grenade);
+}
+
+void fire_grenadeprox (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius, qboolean held)
+{
+	edict_t	*grenade;
+	vec3_t	dir;
+	vec3_t	forward, right, up;
+
+	vectoangles (aimdir, dir);
+	AngleVectors (dir, forward, right, up);
+
+	grenade = G_Spawn();
+	VectorCopy (start, grenade->s.origin);
+	VectorScale (aimdir, speed, grenade->velocity);
+	VectorMA (grenade->velocity, 200 + crandom() * 10.0, up, grenade->velocity);
+	VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
+	VectorSet (grenade->avelocity, 300, 300, 300);
+	grenade->movetype = MOVETYPE_BOUNCE;
+	grenade->clipmask = MASK_SHOT;
+	grenade->solid = SOLID_BBOX;
+	grenade->s.effects |= EF_GRENADE;
+	VectorClear (grenade->mins);
+	VectorClear (grenade->maxs);
+	grenade->s.modelindex = gi.modelindex ("models/objects/grenade2/tris.md2");
+	grenade->owner = self;
+	grenade->touch = Grenade_Touch;
+	grenade->nextthink = level.time + .1; //calls think every .1 seconds
+	grenade->think = Grenade_Proxim_Think;
+	grenade->delay = level.time + 60; // end of grenade's lifespan
+	grenade->dmg = damage;
+	grenade->dmg_radius = damage_radius;
+	grenade->classname = "hgrenade";
+	if (held)
+		grenade->spawnflags = 3;
+	else
+		grenade->spawnflags = 1;
+	grenade->s.sound = gi.soundindex("weapons/hgrenc1b.wav");
+
+	if (timer <= 0.0)
+		Grenade_Explode (grenade);
+	else
+	{
+		gi.sound (self, CHAN_WEAPON, gi.soundindex ("weapons/hgrent1a.wav"), 1, ATTN_NORM, 0);
+		gi.linkentity (grenade);
+	}
 }
 
 //--NAME CHANGE

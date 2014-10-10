@@ -362,7 +362,7 @@ void G_SetStats (edict_t *ent)
 	int			index, cells;
 	int			power_armor_type;
 
-	gi.cprintf(ent, PRINT_HIGH, "%d\n", VectorLength(ent->velocity));
+	//gi.cprintf(ent, PRINT_HIGH, "%d\n", VectorLength(ent->velocity));
 
 	//
 	// health
