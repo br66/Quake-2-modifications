@@ -683,7 +683,7 @@ void Flash_Explode (edict_t *ent)
 	while ((target = findradius(target, ent->s.origin, FLASH_RADIUS)) != NULL)
 	{
 		if (target == ent->owner)
-			continue;
+			gi.centerprintf(target, "WORKS");
 		if (!target->client)
 			continue;
 		if (!visible(ent, target))
@@ -691,7 +691,7 @@ void Flash_Explode (edict_t *ent)
 		if (!infront(target, ent))
 			continue;
 
-		target->client->blindTime += BLIND_FLASH * 1.5;
+		target->client->blindTime += BLIND_FLASH * 2;
 		target->client->blindBase = BLIND_FLASH;
 
 		gi.cprintf(target, PRINT_HIGH, "%s is blinded by your flash grenade!\n", target->client->pers.netname);
