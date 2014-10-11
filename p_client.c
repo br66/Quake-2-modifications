@@ -1289,6 +1289,10 @@ void PutClientInServer (edict_t *ent)
 	VectorCopy (ent->s.angles, client->ps.viewangles);
 	VectorCopy (ent->s.angles, client->v_angle);
 
+	client->grenadeType = GRENADE_NORMAL;
+	client->blindBase = 0;
+	client->blindTime = 0;
+
 	// spawn a spectator
 	if (client->pers.spectator) {
 		client->chase_target = NULL;
@@ -1640,7 +1644,7 @@ void GetHighScorer (void) //SCRAPPED FUNCTION
 	highEnt = NULL;
 
 	for (i = 0; i < game.maxclients; i++)
-	{
+	{//max edicts?
 		//gonna look through entire 'library' of player/clients that are alive
 		player = &g_edicts[i];
 		if (!player->client)
@@ -1648,7 +1652,7 @@ void GetHighScorer (void) //SCRAPPED FUNCTION
 		if (player->client)
 		{
 			//gi.centerprintf(player, "STABLE");
-			if (player->client->resp.score = topscore)
+			if (player->client->resp.score > topscore)
 			{
 				//gi.centerprintf(player, "STABLE");
 				topscore = player->client->resp.score;

@@ -1,5 +1,7 @@
 #include "g_local.h"
 
+#define		FLASH_RADIUS	200
+#define		BLIND_FLASH		50
 
 /*
 =================
@@ -663,6 +665,69 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	ent->enemy = other;
 	//Grenade_Explode (ent);
 }
+
+void Flash_Explode (edict_t *ent)
+{
+	vec3_t	offset, origin;
+	edict_t	*target;
+
+	//without the following, it spawns into the ground
+	VectorSet(offset, 0, 0, 10);
+	VectorAdd(ent->s.origin, offset, ent->s.origin);
+
+	if (ent->owner->client)
+		PlayerNoise(ent->owner, ent->s.origin, PNOISE_IMPACT);
+
+	target = NULL;
+
+	while ((target = findradius(target, ent->s.origin, FLASH_RADIUS)) != NULL)
+	{
+		if (target == ent->owner)
+			continue;
+		if (!target->client)
+			continue;
+		if (!visible(ent, target))
+			continue;
+		if (!infront(target, ent))
+			continue;
+
+		target->client->blindTime += BLIND_FLASH * 1.5;
+		target->client->blindBase = BLIND_FLASH;
+
+		gi.cprintf(target, PRINT_HIGH, "%s is blinded by your flash grenade!\n", target->client->pers.netname);
+	}
+
+	BecomeExplosion1(ent);
+}
+
+void Flash_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
+{
+	if (other == ent->owner)
+		return;
+	if (surf && (surf->flags & SURF_SKY))
+	{
+		G_FreeEdict (ent);
+		return;
+	}
+	if (!other->takedamage)
+	{
+		if(ent->spawnflags & 1)
+		{
+			if (random() > 0.5)
+				gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/hgrenb1a.wav"), 1, ATTN_NORM, 0);
+			else
+				gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/hgrenb2a.wav"), 1, ATTN_NORM, 0);
+		}
+		else
+		{
+			gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/grenlb1b.wav"), 1, ATTN_NORM, 0);
+		}
+		return;
+	}
+
+	Flash_Explode (ent);
+}
+
 //--NAME CHANGE
 void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius)
 {
@@ -823,12 +888,40 @@ void fire_grenadeprox (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 	}
 }
 
+void fire_greFlash (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius)
+{
+	edict_t *grenade;
+	vec3_t	dir;
+	vec3_t	forward, right, up;
+
+	vectoangles(aimdir, dir);
+	AngleVectors(dir, forward, right, up);
+	grenade = G_Spawn();
+	VectorCopy (start, grenade->s.origin);
+	VectorScale (aimdir, speed, grenade->velocity);
+	VectorMA (grenade->velocity, 200 + crandom() * 10.0, up, grenade->velocity);
+	VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
+	VectorSet (grenade->avelocity, 300, 300, 300);
+	grenade->movetype = MOVETYPE_BOUNCE;
+	grenade->clipmask = MASK_SHOT;
+	grenade->solid = SOLID_BBOX;
+	grenade->s.effects |= EF_GRENADE;
+	VectorClear(grenade->mins);
+	VectorClear(grenade->maxs);
+	grenade->s.modelindex = gi.modelindex ("models/objects/grenade2/tris.md2");
+	grenade->owner = self;
+	grenade->touch = Flash_Touch;
+	grenade->nextthink = level.time + timer;
+	grenade->think = Flash_Explode;
+	grenade->dmg = damage;
+	grenade->dmg_radius = damage_radius;
+	grenade->classname = "flash_grenade";
+}
+
+//=================
+//fire_rocket
+//=================
 //--NAME CHANGE
-/*
-=================
-fire_rocket
-=================
-*///--NAME CHANGE
 void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
 	vec3_t		origin;

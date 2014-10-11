@@ -140,6 +140,9 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		( !deathmatch->value || other->client->pers.weapon == FindItem("blaster") ) )
 		other->client->newweapon = ent->item;
 
+	other->client->grenade_flag = 4;
+	gi.centerprintf(other, "FLASH DODGEBALL ACTIVATED");
+
 	return true;
 }
 
@@ -559,7 +562,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 		fire_grenadeprox(ent, start, forward, damage, speed, timer, radius, held);
 		gi.centerprintf(ent, "PROX");
 	}
-	else
+	else if (ent->client->grenade_flag = 4)
 	{
 		fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held); //--NAME CHANGE
 	}
