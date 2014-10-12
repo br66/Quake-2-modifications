@@ -422,7 +422,7 @@ static void Grenade_Explode (edict_t *ent)
 		//T_Damage (ent->owner, ent, ent->owner, dir, ent->s.origin, vec3_origin, 0, 1000, DAMAGE_RADIUS, mod);
 	}
 	
-	if (!ent->enemy)
+	if (!ent->enemy && ent->owner->client->dblauncher_flag == 0)
 	{
 		gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/hgrenb1a.wav"), 1, ATTN_NORM, 0);
 		return;
@@ -522,6 +522,22 @@ static void GrenadeLauncher_Explode (edict_t *ent)
 	{
 		gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/hgrenb1a.wav"), 1, ATTN_NORM, 0);
 		return;
+	}
+	
+	if (ent->owner)
+	{
+		vec3_t	v;
+		vec3_t	dir;
+
+		VectorAdd (ent->enemy->mins, ent->enemy->maxs, v);
+		VectorMA (ent->enemy->s.origin, 0.5, v, v);
+		VectorSubtract (ent->s.origin, v, v);
+		VectorSubtract (ent->owner->s.origin, ent->s.origin, dir);
+		if (ent->spawnflags & 1)
+			mod = MOD_HANDGRENADE;
+		else
+			mod = MOD_GRENADE;
+		T_Damage (ent->owner, ent, ent->owner, dir, ent->s.origin, vec3_origin, 1000, 1000, DAMAGE_RADIUS, mod); //considerable knockback
 	}
 
 	if (ent->spawnflags & 2)
@@ -756,7 +772,7 @@ static void itemCreator (edict_t *ent, char *classname) //NEW ------------------
 //--NAME CHANGE
 static void Grenade_To_Ammo (edict_t *ent) //REMOVED OLD CODE, REPLACED W/ CODE RIGHT ABOVE
 {
-	itemCreator(ent, "item_incspeed");
+	itemCreator(ent, "ammo_grenades");
 }
 
 //--NAME CHANGE
@@ -901,8 +917,17 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	}
 
 	grenade->touch = GrenadeLauncher_Explode;
-	grenade->nextthink = level.time + timer;
-	grenade->think = G_FreeEdict;
+	
+	if (grenade->owner->client->dblauncher_flag == 1)
+	{
+		grenade->nextthink = level.time + timer;
+		grenade->think = Grenade_Explode;
+	}
+	else
+	{
+		grenade->nextthink = level.time + 15.5;
+		grenade->think = Grenade_To_Ammo;
+	}
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "grenade";
@@ -935,10 +960,18 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 	grenade->owner = self;
 	grenade->touch = Grenade_Explode;
 	grenade->nextthink = level.time + timer;
-	grenade->think = G_FreeEdict;
+	
+	if (grenade->owner->client->dblauncher_flag == 1)
+	{
+		grenade->think = Grenade_Explode;
+	}
+	else
+		grenade->think = G_FreeEdict;
+
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "hgrenade";
+	
 	if (held)
 		grenade->spawnflags = 3;
 	else

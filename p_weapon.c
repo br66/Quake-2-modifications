@@ -146,6 +146,43 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 	return true;
 }
 
+qboolean Pickup_Weapon2 (edict_t *ent, edict_t *other)
+{
+	int			index;
+	gitem_t		*ammo;
+
+	index = ITEM_INDEX(ent->item);
+
+	if ( ( ((int)(dmflags->value) & DF_WEAPONS_STAY) || coop->value) 
+		&& other->client->pers.inventory[index])
+	{
+		if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM) ) )
+			return false;	// leave the weapon for others to pickup
+	}
+
+	other->client->pers.inventory[index]++; //adds a new weapon to the inventory???
+
+	if (!(ent->spawnflags & DROPPED_ITEM) )
+	{
+		// give them some ammo with it
+		ammo = FindItem (ent->item->ammo);
+		if ( (int)dmflags->value & DF_INFINITE_AMMO )
+			Add_Ammo (other, ammo, 1000);
+		else
+			Add_Ammo (other, ammo, ammo->quantity);
+	}
+
+	if (other->client->pers.weapon != ent->item && 
+		(other->client->pers.inventory[index] == 1) &&
+		( !deathmatch->value || other->client->pers.weapon == FindItem("blaster") ) )
+		other->client->newweapon = ent->item;
+
+	other->client->grenade_flag = 4;
+	gi.centerprintf(other, "FLASH DODGEBALL ACTIVATED");
+
+	return true;
+}
+
 
 /*
 ===============
@@ -567,7 +604,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 		fire_greFlash (ent, start, forward, 1000, speed, timer, radius); //--NAME CHANGE
 	}
 	else
-		fire_grenade2 (ent, start, forward, 1000, speed, timer, radius, held); //orig. damage
+		fire_grenade2 (ent, start, forward, 1000, speed += 20, timer, radius, held); //orig. damage
 	//if flag = fire regular grenade
 	//if grenade_flag = 0 (firegrenade2)
 	//if flag = fire homing grenade
@@ -746,7 +783,7 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 
 	//speed = GRENADE_MINSPEED + (ALT_GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / ALT_GRENADE_TIMER); //CHANGED
 
-	fire_grenade (ent, start, forward, 1000, 600, 2, radius); //CHANGING THE TIMER FROM 2.5 TO 9.5, speed 600
+	fire_grenade (ent, start, forward, 1000, 650, 2, radius); //CHANGING THE TIMER FROM 2.5 TO 9.5, speed 600
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
@@ -1439,7 +1476,7 @@ void weapon_bfg_fire (edict_t *ent)
 
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_bfg (ent, start, forward, damage, 800, damage_radius);
+	fire_bfg (ent, start, forward, 1000, 800, damage_radius);
 
 	ent->client->ps.gunframe++;
 

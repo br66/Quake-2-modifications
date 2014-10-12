@@ -2,6 +2,7 @@
 
 
 qboolean	Pickup_Weapon (edict_t *ent, edict_t *other);
+qboolean	Pickup_Weapon2 (edict_t *ent, edict_t *other);
 void		Use_Weapon (edict_t *ent, gitem_t *inv);
 void		Drop_Weapon (edict_t *ent, gitem_t *inv);
 
@@ -1546,31 +1547,31 @@ always owned, never in the world
 /*QUAKED weapon_railgun (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"weapon_railgun", 
-		Pickup_Weapon,
+		"weapon_railgun", //orig. weapon_railgun 
+		Pickup_Weapon2,
 		Use_Weapon,
 		Drop_Weapon,
-		Weapon_Railgun,
+		Weapon_BFG, //orig. weapon_BFG
 		"misc/w_pkup.wav",
 		"models/weapons/g_rail/tris.md2", EF_ROTATE,
 		"models/weapons/v_rail/tris.md2",
-/* icon */		"w_railgun",
-/* pickup */	"Railgun",
+/* icon */		"w_bfg",
+/* pickup */	"BFG10K",
 		0,
-		1,
-		"Slugs",
+		50,
+		"Cells",
 		IT_WEAPON|IT_STAY_COOP,
-		WEAP_RAILGUN,
+		WEAP_BFG,
 		NULL,
 		0,
-/* precache */ "weapons/rg_hum.wav"
+/* precache */ "sprites/s_bfg1.sp2 sprites/s_bfg2.sp2 sprites/s_bfg3.sp2 weapons/bfg__f1y.wav weapons/bfg__l1a.wav weapons/bfg__x1b.wav weapons/bfg_hum.wav"
 	},
 
 /*QUAKED weapon_bfg (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
 		"weapon_bfg",
-		Pickup_Weapon,
+		Pickup_Weapon2,
 		Use_Weapon,
 		Drop_Weapon,
 		Weapon_BFG,
