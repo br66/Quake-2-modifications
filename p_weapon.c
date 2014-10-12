@@ -744,7 +744,7 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 
 	//speed = GRENADE_MINSPEED + (ALT_GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / ALT_GRENADE_TIMER); //CHANGED
 
-	fire_grenade (ent, start, forward, damage, 600, 9.5, radius); //CHANGING THE TIMER FROM 2.5 TO 9.5, speed 600
+	fire_grenade (ent, start, forward, damage, 600, 2, radius); //CHANGING THE TIMER FROM 2.5 TO 9.5, speed 600
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);

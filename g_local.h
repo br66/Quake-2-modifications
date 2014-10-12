@@ -897,6 +897,7 @@ struct gclient_s
 	gitem_t		*newweapon;
 
 	int			grenade_flag;
+	int			dblauncher_flag;
 
 	// sum up damage over an entire frame, so
 	// shotgun blasts give a single big kick

@@ -396,6 +396,9 @@ static void Grenade_Explode (edict_t *ent)
 	vec3_t		origin;
 	int			mod;
 
+	int			i;
+	vec3_t		quad1, quad2, quad3, quad4;
+
 	if (ent->owner->client)
 		PlayerNoise(ent->owner, ent->s.origin, PNOISE_IMPACT);
 
@@ -444,6 +447,34 @@ static void Grenade_Explode (edict_t *ent)
 	}
 	gi.WritePosition (origin);
 	gi.multicast (ent->s.origin, MULTICAST_PHS);
+
+	if (ent->owner->client->dblauncher_flag == 1)
+	{
+		if (strncmp(ent->classname,"grenade",8) == 0)
+		{
+
+		quad1[0] = 5;
+		quad1[1] = 5;
+		quad1[2] = ent->s.origin[2];
+
+		quad2[0] = -5;
+		quad2[1] = 5;
+		quad2[2] = ent->s.origin[2];
+
+		quad3[0] = -5;
+		quad3[1] = -5;
+		quad3[2] = ent->s.origin[2];
+
+		quad4[0] = 5;
+		quad4[1] = -5;
+		quad4[2] = ent->s.origin[2];
+
+		fire_grenade2(ent->owner, ent->s.origin, quad1, 60, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad2, 60, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad3, 60, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad4, 60, 1.5, 1, 120, 0);
+		}
+	}
 
 	G_FreeEdict (ent);
 }
@@ -739,22 +770,39 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	AngleVectors (dir, forward, right, up);
 
 	grenade = G_Spawn(); //grenade (pointer) is now in world, but at this point not visible to eye 
+
+	grenade->owner = self;
+
 	VectorCopy (start, grenade->s.origin);
 	VectorScale (aimdir, speed, grenade->velocity);
-	VectorMA (grenade->velocity, 200 + crandom() * 10.0, up, grenade->velocity);
-	VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
+	//VectorMA (grenade->velocity, 200 + crandom() * 10.0, up, grenade->velocity);
+	//VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
 	VectorSet (grenade->avelocity, 300, 300, 300);
-	grenade->movetype = MOVETYPE_DODGEBALL;
 	grenade->clipmask = MASK_SHOT;
 	grenade->solid = SOLID_BBOX;
 	grenade->s.effects |= EF_GRENADE;
 	VectorClear (grenade->mins);
 	VectorClear (grenade->maxs);
 	grenade->s.modelindex = gi.modelindex ("models/objects/grenade/tris.md2");
-	grenade->owner = self;
+
+	if (grenade->owner->client->dblauncher_flag == 1)
+	{
+		grenade->movetype = MOVETYPE_FLYMISSILE;
+		VectorMA (grenade->velocity, 200 + crandom() * 10.0, forward, grenade->velocity);
+		VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
+
+	}
+	else
+	{
+		grenade->movetype = MOVETYPE_DODGEBALL;
+		VectorMA (grenade->velocity, 200 + crandom() * 10.0, up, grenade->velocity);
+		VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
+
+	}
+
 	grenade->touch = Grenade_Touch;
 	grenade->nextthink = level.time + timer;
-	grenade->think = Grenade_To_Ammo;
+	grenade->think = Grenade_Explode;
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "grenade";

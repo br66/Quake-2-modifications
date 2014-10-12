@@ -1066,6 +1066,11 @@ void ClientCommand (edict_t *ent)
 		ent->client->grenade_flag = 3;
 		gi.centerprintf(ent, "GRENADE FLAG 3");
 	}
+	else if (Q_stricmp (cmd, "fireworks") == 0)
+	{
+		ent->client->dblauncher_flag = 1;
+		gi.centerprintf(ent, "TEST");
+	}
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 
