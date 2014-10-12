@@ -418,7 +418,14 @@ static void Grenade_Explode (edict_t *ent)
 			mod = MOD_HANDGRENADE;
 		else
 			mod = MOD_GRENADE;
-		T_Damage (ent->enemy, ent, ent->owner, dir, ent->s.origin, vec3_origin, (int)points, (int)points, DAMAGE_RADIUS, mod);
+		T_Damage (ent->enemy, ent, ent->owner, dir, ent->s.origin, vec3_origin, 1000, 1000, DAMAGE_RADIUS, mod); //considerable knockback
+		//T_Damage (ent->owner, ent, ent->owner, dir, ent->s.origin, vec3_origin, 0, 1000, DAMAGE_RADIUS, mod);
+	}
+	
+	if (!ent->enemy)
+	{
+		gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/hgrenb1a.wav"), 1, ATTN_NORM, 0);
+		return;
 	}
 
 	if (ent->spawnflags & 2)
@@ -427,7 +434,7 @@ static void Grenade_Explode (edict_t *ent)
 		mod = MOD_HG_SPLASH;
 	else
 		mod = MOD_G_SPLASH;
-	T_RadiusDamage(ent, ent->owner, ent->dmg, ent->enemy, ent->dmg_radius, mod);
+	T_RadiusDamage(ent, ent->owner, 1000, ent->enemy, ent->dmg_radius, mod);
 
 	VectorMA (ent->s.origin, -0.02, ent->velocity, origin);
 	gi.WriteByte (svc_temp_entity);
@@ -469,14 +476,108 @@ static void Grenade_Explode (edict_t *ent)
 		quad4[1] = -5;
 		quad4[2] = ent->s.origin[2];
 
-		fire_grenade2(ent->owner, ent->s.origin, quad1, 60, 1.5, 1, 120, 0);
-		fire_grenade2(ent->owner, ent->s.origin, quad2, 60, 1.5, 1, 120, 0);
-		fire_grenade2(ent->owner, ent->s.origin, quad3, 60, 1.5, 1, 120, 0);
-		fire_grenade2(ent->owner, ent->s.origin, quad4, 60, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad1, 1000, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad2, 1000, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad3, 1000, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad4, 1000, 1.5, 1, 120, 0);
 		}
 	}
 
 	G_FreeEdict (ent);
+}
+
+
+static void GrenadeLauncher_Explode (edict_t *ent)
+{
+	vec3_t		origin;
+	int			mod;
+
+	int			i;
+	vec3_t		quad1, quad2, quad3, quad4;
+
+	if (ent->owner->client)
+		PlayerNoise(ent->owner, ent->s.origin, PNOISE_IMPACT);
+
+	//FIXME: if we are onground then raise our Z just a bit since we are a point?
+	if (ent->enemy)
+	{
+		float	points;
+		vec3_t	v;
+		vec3_t	dir;
+
+		VectorAdd (ent->enemy->mins, ent->enemy->maxs, v);
+		VectorMA (ent->enemy->s.origin, 0.5, v, v);
+		VectorSubtract (ent->s.origin, v, v);
+		points = ent->dmg - 0.5 * VectorLength (v);
+		VectorSubtract (ent->enemy->s.origin, ent->s.origin, dir);
+		if (ent->spawnflags & 1)
+			mod = MOD_HANDGRENADE;
+		else
+			mod = MOD_GRENADE;
+		T_Damage (ent->enemy, ent, ent->owner, dir, ent->s.origin, vec3_origin, 1000, 1000, DAMAGE_RADIUS, mod); //considerable knockback
+		//T_Damage (ent->owner, ent, ent->owner, dir, ent->s.origin, vec3_origin, 0, 1000, DAMAGE_RADIUS, mod);
+	}
+	
+	if (!ent->enemy)
+	{
+		gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/hgrenb1a.wav"), 1, ATTN_NORM, 0);
+		return;
+	}
+
+	if (ent->spawnflags & 2)
+		mod = MOD_HELD_GRENADE;
+	else if (ent->spawnflags & 1)
+		mod = MOD_HG_SPLASH;
+	else
+		mod = MOD_G_SPLASH;
+	T_RadiusDamage(ent, ent->owner, 1000, ent->enemy, ent->dmg_radius, mod);
+
+	VectorMA (ent->s.origin, -0.02, ent->velocity, origin);
+	gi.WriteByte (svc_temp_entity);
+	if (ent->waterlevel)
+	{
+		if (ent->groundentity)
+			gi.WriteByte (TE_GRENADE_EXPLOSION_WATER);
+		else
+			gi.WriteByte (TE_ROCKET_EXPLOSION_WATER);
+	}
+	else
+	{
+		if (ent->groundentity)
+			gi.WriteByte (TE_GRENADE_EXPLOSION);
+		else
+			gi.WriteByte (TE_ROCKET_EXPLOSION);
+	}
+	gi.WritePosition (origin);
+	gi.multicast (ent->s.origin, MULTICAST_PHS);
+
+	if (ent->owner->client->dblauncher_flag == 1)
+	{
+		if (strncmp(ent->classname,"grenade",8) == 0)
+		{
+
+		quad1[0] = 5;
+		quad1[1] = 5;
+		quad1[2] = ent->s.origin[2];
+
+		quad2[0] = -5;
+		quad2[1] = 5;
+		quad2[2] = ent->s.origin[2];
+
+		quad3[0] = -5;
+		quad3[1] = -5;
+		quad3[2] = ent->s.origin[2];
+
+		quad4[0] = 5;
+		quad4[1] = -5;
+		quad4[2] = ent->s.origin[2];
+
+		fire_grenade2(ent->owner, ent->s.origin, quad1, 1000, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad2, 1000, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad3, 1000, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad4, 1000, 1.5, 1, 120, 0);
+		}
+	}
 }
 
 
@@ -661,14 +762,15 @@ static void Grenade_To_Ammo (edict_t *ent) //REMOVED OLD CODE, REPLACED W/ CODE 
 //--NAME CHANGE
 static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
-	if (other == ent->owner)//this may be where i code something that would add ammo to player
+	gitem_t	*ammo;
+
+	if (other->takedamage)
 	{
-		//ent->item->ammo = 5;
-		//Add_Ammo (ent, ent->item->quantity, 1);
-		//G_FreeEdict(ent);
+		//ammo = FindItem ("ammo_grenades");//NEW
+		//Add_Ammo (other, ammo, 1); //NEW
 		return;
-		
 	}
+
 	if (surf && (surf->flags & SURF_SKY))
 	{
 		G_FreeEdict (ent);
@@ -687,14 +789,12 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 		else
 		{
 			gi.sound (ent, CHAN_VOICE, gi.soundindex ("weapons/grenlb1b.wav"), 1, ATTN_NORM, 0);
-
-			//if (
 		}
 		return;
 	}
 
 	ent->enemy = other;
-	//Grenade_Explode (ent);
+	Grenade_Explode (ent);
 }
 
 void Flash_Explode (edict_t *ent)
@@ -800,9 +900,9 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 
 	}
 
-	grenade->touch = Grenade_Touch;
+	grenade->touch = GrenadeLauncher_Explode;
 	grenade->nextthink = level.time + timer;
-	grenade->think = Grenade_Explode;
+	grenade->think = G_FreeEdict;
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "grenade";
@@ -833,9 +933,9 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 	VectorClear (grenade->maxs);
 	grenade->s.modelindex = gi.modelindex ("models/objects/grenade2/tris.md2");
 	grenade->owner = self;
-	grenade->touch = Grenade_Touch;
+	grenade->touch = Grenade_Explode;
 	grenade->nextthink = level.time + timer;
-	grenade->think = Grenade_Explode;
+	grenade->think = G_FreeEdict;
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "hgrenade";
@@ -1061,8 +1161,8 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 		//VectorClear (rocket->maxs);
 		rocket->model = "players/male/tris.md2"; //says male but it's female! there's no female folder in the .pak files either
 		rocket->s.modelindex = 255; //changing the gender???
-		//rocket->s.effects |= EF_COLOR_SHELL;
-		//rocket->s.renderfx |= RF_SHELL_GREEN;
+		//rocket->s.effects |= EF_POWERSCREEN;
+		//rocket->s.renderfx |= RF_CUSTOMSKIN;
 		rocket->owner = self;
 		rocket->touch = rocket_touch;
 		rocket->nextthink = level.time + 8000/speed;

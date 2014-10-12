@@ -1054,12 +1054,18 @@ void ClientCommand (edict_t *ent)
 		ent->client->grenade_flag = 2;
 		gi.centerprintf(ent, "GRENADE FLAG 2");
 	}
-	else if (Q_stricmp (cmd, "camo") == 0)
+	else if (Q_stricmp (cmd, "camo") == 0) //NEW
 	{
-		ent->s.effects |= EF_POWERSCREEN;
-		ent->s.renderfx |= RF_FULLBRIGHT;
-
-		//gi.centerprintf(ent, "CAMOFLAUGE");
+		if (ent->svflags & SVF_NOCLIENT)
+		{
+			ent->svflags -= SVF_NOCLIENT;
+			//gi.centerprintf(ent, "%d", ent->client->grenade_flag);
+		}
+		else
+		{
+			ent->svflags |= SVF_NOCLIENT;
+			//gi.centerprintf(ent, "invixible");
+		}
 	}
 	else if (Q_stricmp (cmd, "proximity") == 0)
 	{
@@ -1069,7 +1075,7 @@ void ClientCommand (edict_t *ent)
 	else if (Q_stricmp (cmd, "fireworks") == 0)
 	{
 		ent->client->dblauncher_flag = 1;
-		gi.centerprintf(ent, "TEST");
+		gi.centerprintf(ent, "FIREWORKS");
 	}
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);

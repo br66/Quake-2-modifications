@@ -555,17 +555,19 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	{
 		//ent->grenade_flag = 2;
 		speed *= 100000;
-		fire_grenade2(ent, start, forward, damage, speed += 100, timer, radius, held);
+		fire_grenade2(ent, start, forward, 1000, speed += 100, timer, radius, held);
 	}
 	else if(ent->client->grenade_flag == 3)
 	{
-		fire_grenadeprox(ent, start, forward, damage, speed, timer, radius, held);
+		fire_grenadeprox(ent, start, forward, 1000, speed, timer, radius, held);
 		gi.centerprintf(ent, "PROX");
 	}
-	else if (ent->client->grenade_flag = 4)
+	else if (ent->client->grenade_flag == 4)
 	{
-		fire_greFlash (ent, start, forward, damage, speed, timer, radius); //--NAME CHANGE
+		fire_greFlash (ent, start, forward, 1000, speed, timer, radius); //--NAME CHANGE
 	}
+	else
+		fire_grenade2 (ent, start, forward, 1000, speed, timer, radius, held); //orig. damage
 	//if flag = fire regular grenade
 	//if grenade_flag = 0 (firegrenade2)
 	//if flag = fire homing grenade
@@ -744,7 +746,7 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 
 	//speed = GRENADE_MINSPEED + (ALT_GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / ALT_GRENADE_TIMER); //CHANGED
 
-	fire_grenade (ent, start, forward, damage, 600, 2, radius); //CHANGING THE TIMER FROM 2.5 TO 9.5, speed 600
+	fire_grenade (ent, start, forward, 1000, 600, 2, radius); //CHANGING THE TIMER FROM 2.5 TO 9.5, speed 600
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
