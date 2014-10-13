@@ -591,22 +591,22 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	if (ent->client->grenade_flag == 2)
 	{
 		//ent->grenade_flag = 2;
-		speed *= 100000;
+		speed *= 10000;
 		fire_grenade2(ent, start, forward, 1000, speed += 100, timer, radius, held);
 	}
 	else if(ent->client->grenade_flag == 3)
 	{
 		fire_grenadeprox(ent, start, forward, 1000, speed, timer, radius, held);
-		gi.centerprintf(ent, "proximity");
+		//gi.centerprintf(ent, "proximity");
 	}
 	else if (ent->client->grenade_flag == 4)
 	{
-		fire_greFlash (ent, start, forward, 1000, speed, timer, radius);
+		fire_greFlash (ent, start, forward, 0, speed, timer, radius);
 	}
 	else if (ent->client->grenade_flag == 5)
 	{
-		Fire_Homing_Grenade (ent, start, forward, damage, speed, radius);
-		gi.centerprintf(ent, "homing");
+		Fire_Homing_Grenade (ent, start, forward, 1000, speed+=40, radius);
+		//gi.centerprintf(ent, "homing");
 	}
 	else
 		fire_grenade2 (ent, start, forward, 1000, speed += 20, timer, radius, held); //orig. damage
@@ -648,7 +648,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 void Weapon_GrenadeFlash (edict_t *ent)
 {
 	ent->client->grenade_flag = 4;
-	gi.centerprintf(ent, "using flash grenade");
+	gi.centerprintf(ent, "flash grenade active");
 
 	if ((ent->client->newweapon) && (ent->client->weaponstate == WEAPON_READY))
 	{
@@ -1142,10 +1142,10 @@ void Weapon_Blaster_Fire (edict_t *ent)
 	int		damage;
 
 	if (deathmatch->value)
-		damage = 15;
+		damage = 0;
 	else
-		damage = 10;
-	Blaster_Fire (ent, vec3_origin, damage, false, EF_BLASTER);
+		damage = 0;
+	Blaster_Fire (ent, vec3_origin, 0, false, EF_BLASTER);
 	ent->client->ps.gunframe++;
 }
 
@@ -1249,7 +1249,7 @@ void Machinegun_Fire (edict_t *ent)
 	vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		angles;
-	int			damage = 8;
+	int			damage = 0;
 	int			kick = 2;
 	vec3_t		offset;
 
@@ -1304,7 +1304,7 @@ void Machinegun_Fire (edict_t *ent)
 	AngleVectors (angles, forward, right, NULL);
 	VectorSet(offset, 0, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
+	fire_bullet (ent, start, forward, 0, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
@@ -1479,7 +1479,7 @@ void weapon_shotgun_fire (edict_t *ent)
 	vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		offset;
-	int			damage = 4;
+	int			damage = 0;
 	int			kick = 8;
 
 	if (ent->client->ps.gunframe == 9)
@@ -1503,9 +1503,9 @@ void weapon_shotgun_fire (edict_t *ent)
 	}
 
 	if (deathmatch->value)
-		fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
+		fire_shotgun (ent, start, forward, 0, kick, 500, 500, DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
 	else
-		fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_SHOTGUN_COUNT, MOD_SHOTGUN);
+		fire_shotgun (ent, start, forward, 0, kick, 500, 500, DEFAULT_SHOTGUN_COUNT, MOD_SHOTGUN);
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -1670,9 +1670,9 @@ void weapon_bfg_fire (edict_t *ent)
 	float	damage_radius = 1000;
 
 	if (deathmatch->value)
-		damage = 200;
+		damage = 1000;
 	else
-		damage = 500;
+		damage = 1000;
 
 	if (ent->client->ps.gunframe == 9)
 	{

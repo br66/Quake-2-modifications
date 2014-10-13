@@ -484,7 +484,7 @@ void	Use_Proximity (edict_t *ent, gitem_t *item) //NEW
 	if (ent->client->grenade_flag != 3)
 		ent->client->grenade_flag = 3;
 
-	gi.centerprintf(ent, "grenade flag 3");
+	//gi.centerprintf(ent, "grenade flag 3");
 
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
 	ValidateSelectedItem (ent);
