@@ -433,17 +433,8 @@ void G_SetStats (edict_t *ent)
 	//
 	// timers
 	//
-	if (ent->client->quad_framenum > level.framenum)
-	{
-		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_quad");
-		ent->client->ps.stats[STAT_TIMER] = (ent->client->quad_framenum - level.framenum)/10;
-	}
-	else if (ent->client->invincible_framenum > level.framenum)
-	{
-		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
-		ent->client->ps.stats[STAT_TIMER] = (ent->client->invincible_framenum - level.framenum)/10;
-	}
-	else if (ent->client->moongravity_framenum > level.framenum)
+
+	if (ent->client->moongravity_framenum > level.framenum)
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
 		ent->client->ps.stats[STAT_TIMER] = (ent->client->moongravity_framenum - level.framenum)/10;
@@ -456,7 +447,6 @@ void G_SetStats (edict_t *ent)
 		// I REALLY didn't want to have to put this here; it makes the code unorganized.
 		// Unlike, the Use Moon Gravity function, this one is called every frame.
 	}
-
 	if (ent->client->hominggrenade_framenum > level.framenum)
 	{
 		ent->client->grenade_flag = 5;
@@ -465,28 +455,54 @@ void G_SetStats (edict_t *ent)
 	}
 	else if (ent->client->hominggrenade_framenum < level.framenum)
 	{
+		if (ent->client->lightspeed_framenum < level.framenum)
 		ent->client->grenade_flag = 0;
 	}
-	else if (ent->client->enviro_framenum > level.framenum)
+	if (ent->client->lightspeed_framenum > level.framenum)
 	{
-		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_envirosuit");
-		ent->client->ps.stats[STAT_TIMER] = (ent->client->enviro_framenum - level.framenum)/10;
+		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
+		ent->client->ps.stats[STAT_TIMER] = (ent->client->lightspeed_framenum - level.framenum)/10;
 	}
-	else if (ent->client->breather_framenum > level.framenum)
+	else if (ent->client->lightspeed_framenum < level.framenum)
 	{
-		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_rebreather");
-		ent->client->ps.stats[STAT_TIMER] = (ent->client->breather_framenum - level.framenum)/10;
+		if (ent->client->hominggrenade_framenum < level.framenum)
+		ent->client->grenade_flag = 0;
 	}
-	//else if (ent->client->lightspeed_framenum > level.framenum)
+
+	if (ent->client->lightspeed_framenum < level.framenum && ent->client->hominggrenade_framenum < level.framenum && ent->client->moongravity_framenum < level.framenum)
+	{
+	 ent->client->ps.stats[STAT_TIMER_ICON] = 0;
+	 ent->client->ps.stats[STAT_TIMER] = 0;
+	}
+
+
+
+	//if (ent->client->quad_framenum > level.framenum)
+	//{
+		//ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_quad");
+		//ent->client->ps.stats[STAT_TIMER] = (ent->client->quad_framenum - level.framenum)/10;
+	//}
+	//else if (ent->client->invincible_framenum > level.framenum)
 	//{
 		//ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
-		//ent->client->ps.stats[STAT_TIMER] = (ent->client->lightspeed_framenum - level.framenum)/10;
+		//ent->client->ps.stats[STAT_TIMER] = (ent->client->invincible_framenum - level.framenum)/10;
 	//}
-	//else if (ent->client->lightspeed_framenum < level.framenum)
+	//else if (ent->client->enviro_framenum > level.framenum)
 	//{
-		//ent->client->grenade_flag = 0;
+		//ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_envirosuit");
+		//ent->client->ps.stats[STAT_TIMER] = (ent->client->enviro_framenum - level.framenum)/10;
 	//}
-
+	//else if (ent->client->breather_framenum > level.framenum)
+	//{
+		//ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_rebreather");
+		//ent->client->ps.stats[STAT_TIMER] = (ent->client->breather_framenum - level.framenum)/10;
+	//}
+	//else
+	//{
+		//ent->client->ps.stats[STAT_TIMER_ICON] = 0;
+		//ent->client->ps.stats[STAT_TIMER] = 0;
+	//}
+	
 	//if (ent->client->proximity_framenum > level.framenum)
 	//{
 		//ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
@@ -496,12 +512,6 @@ void G_SetStats (edict_t *ent)
 	//{
 		//ent->client->grenade_flag = 0;
 	//}
-	else
-	{
-		ent->client->ps.stats[STAT_TIMER_ICON] = 0;
-		ent->client->ps.stats[STAT_TIMER] = 0;
-	}
-
 	//if (ent->client->lightspeed_framenum > level.framenum)
 	//{
 		//ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
@@ -521,6 +531,7 @@ void G_SetStats (edict_t *ent)
 	//{
 		//ent->client->grenade_flag = 0;
 	//}
+//=======================================
 
 	//
 	// selected item

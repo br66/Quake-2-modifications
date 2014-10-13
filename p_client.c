@@ -1928,7 +1928,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	//gi.centerprintf(
 
 	///gi.centerprintf(ent, "%f, %f, %f", ent->s.origin[0], ent->s.origin[1], ent->s.origin[2]);
-	gi.centerprintf(ent, "%f", ent->client->grenade_flag);
+	gi.centerprintf(ent, "%d", ent->client->grenade_flag);
 }
 
 

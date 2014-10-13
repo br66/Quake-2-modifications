@@ -458,12 +458,9 @@ void	Use_Homing (edict_t *ent, gitem_t *item) //NEW
 
 void	Use_LightSpeed (edict_t *ent, gitem_t *item) //NEW
 {
-	//sv_gravity->value = 200;
-
+	gi.centerprintf(ent, "grenade flag 2");
 	if (ent->client->grenade_flag != 2)
 		ent->client->grenade_flag = 2;
-
-	gi.centerprintf(ent, "grenade flag 2");
 
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
 	ValidateSelectedItem (ent);
@@ -471,10 +468,12 @@ void	Use_LightSpeed (edict_t *ent, gitem_t *item) //NEW
 	if (ent->client->lightspeed_framenum > level.framenum)
 	{
 		ent->client->lightspeed_framenum += 300;
+		ent->client->grenade_flag = 2;
 	}
 	else
 	{
 		ent->client->lightspeed_framenum = level.framenum + 300;
+		ent->client->grenade_flag = 2;
 	}
 	
 	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
@@ -1981,23 +1980,23 @@ gives +1 to maximum health
 */
 	{
 		"item_pack",
-		Pickup_Pack,
-		NULL,
-		NULL,
+		Pickup_Powerup,
+		Use_LightSpeed,
+		Drop_General,
 		NULL,
 		"items/pkup.wav",
 		"models/items/pack/tris.md2", EF_ROTATE,
 		NULL,
 /* icon */		"i_pack",
-/* pickup */	"Ammo Pack",
+/* pickup */	"Lightspeed Grenade Powerup",
 /* width */		2,
-		180,
+		300,
+		NULL,
+		IT_POWERUP,
+		0,
 		NULL,
 		0,
-		0,
-		NULL,
-		0,
-/* precache */ ""
+/* precache */ "items/protect.wav items/protect2.wav items/protect4.wav"
 	},
 
 /*QUAKED item_moongravity (.3 .3 1) (-16 -16 -16) (16 16 16)
