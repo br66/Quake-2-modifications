@@ -1338,26 +1338,26 @@ gitem_t	itemlist[] =
 /* precache */ ""
 	},
 
-/*QUAKED item_armor_shard (.3 .3 1) (-16 -16 -16) (16 16 16)
+/*QUAKED XXX Proximity Ball XXX (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
 		"item_armor_shard", 
-		Pickup_Armor,
+		Pickup_Powerup,
+		Use_Proximity,
+		Drop_General,
 		NULL,
-		NULL,
-		NULL,
-		"misc/ar2_pkup.wav",
+		"misc/w_pkup.wav",
 		"models/items/armor/shard/tris.md2", EF_ROTATE,
-		NULL,
+		"models/weapons/v_shotg2/tris.md2",
 /* icon */		"i_jacketarmor",
-/* pickup */	"Armor Shard",
-/* width */		3,
+/* pickup */	"Prox Ball",
+/* width */		2,
+		300,
+		NULL,
+		IT_POWERUP,
 		0,
 		NULL,
-		IT_ARMOR,
 		0,
-		NULL,
-		ARMOR_SHARD,
 /* precache */ ""
 	},
 
@@ -1472,7 +1472,7 @@ always owned, never in the world
 		"models/weapons/g_shotg2/tris.md2", EF_ROTATE,
 		"models/weapons/v_shotg2/tris.md2",
 /* icon */		"w_sshotgun",
-/* pickup */	"Homing Grenade Powerup",
+/* pickup */	"Smart Dodgeball Powerup",
 		2,
 		300,
 		NULL,
@@ -1518,7 +1518,7 @@ always owned, never in the world
 		"models/items/invulner/tris.md2", EF_ROTATE,
 		NULL,
 /* icon */		"p_invulnerability",
-/* pickup */	"Moon Gravity",
+/* pickup */	"Moon Gravity +30secs",
 		2,
 		300,
 		NULL,
@@ -1564,7 +1564,7 @@ always owned, never in the world
 		"models/weapons/g_launch/tris.md2", EF_ROTATE, //world
 		"models/weapons/v_launch/tris.md2",	//view
 /* icon */		"w_glauncher",
-/* pickup */	"Grenade Launcher",
+/* pickup */	"Dodgeball Launcher",
 		0, // can't have more than 1 grenade laucher
 		1, //1 grenade launcher
 		"Grenades",
@@ -1633,7 +1633,7 @@ always owned, never in the world
 		"models/weapons/g_rail/tris.md2", EF_ROTATE,
 		"models/weapons/v_rail/tris.md2",
 /* icon */		"w_bfg",
-/* pickup */	"BFG1",
+/* pickup */	"DB0L",
 		0,
 		50,
 		"Cells",
@@ -1706,7 +1706,7 @@ always owned, never in the world
 		"models/items/ammo/grenades/medium/tris.md2", 0,
 		"models/weapons/v_handgr/tris.md2",
 /* icon */		"a_grenades",
-/* pickup */	"Flash Grenades",
+/* pickup */	"Flash Dodgeball",
 /* width */		3,
 		5,
 		"grenades",
@@ -1988,7 +1988,7 @@ gives +1 to maximum health
 		"models/items/pack/tris.md2", EF_ROTATE,
 		NULL,
 /* icon */		"i_pack",
-/* pickup */	"Lightspeed Grenade Powerup",
+/* pickup */	"Lightspeed Ball Powerup",
 /* width */		2,
 		300,
 		NULL,

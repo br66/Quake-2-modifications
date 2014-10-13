@@ -456,7 +456,10 @@ void G_SetStats (edict_t *ent)
 	else if (ent->client->hominggrenade_framenum < level.framenum)
 	{
 		if (ent->client->lightspeed_framenum < level.framenum)
-		ent->client->grenade_flag = 0;
+		{
+			if (ent->client->proximity_framenum < level.framenum)
+				ent->client->grenade_flag = 0;
+		}
 	}
 	if (ent->client->lightspeed_framenum > level.framenum)
 	{
@@ -466,10 +469,26 @@ void G_SetStats (edict_t *ent)
 	else if (ent->client->lightspeed_framenum < level.framenum)
 	{
 		if (ent->client->hominggrenade_framenum < level.framenum)
-		ent->client->grenade_flag = 0;
+		{
+			if (ent->client->proximity_framenum < level.framenum)
+				ent->client->grenade_flag = 0;
+		}
+	}
+	if (ent->client->proximity_framenum > level.framenum)
+	{
+		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
+		ent->client->ps.stats[STAT_TIMER] = (ent->client->proximity_framenum - level.framenum)/10;
+	}
+	else if (ent->client->proximity_framenum < level.framenum)
+	{
+		if (ent->client->hominggrenade_framenum < level.framenum)
+		{
+			if (ent->client->lightspeed_framenum < level.framenum)
+				ent->client->grenade_flag = 0;
+		}
 	}
 
-	if (ent->client->lightspeed_framenum < level.framenum && ent->client->hominggrenade_framenum < level.framenum && ent->client->moongravity_framenum < level.framenum)
+	if (ent->client->lightspeed_framenum < level.framenum && ent->client->hominggrenade_framenum < level.framenum && ent->client->moongravity_framenum < level.framenum && ent->client->proximity_framenum < level.framenum)
 	{
 	 ent->client->ps.stats[STAT_TIMER_ICON] = 0;
 	 ent->client->ps.stats[STAT_TIMER] = 0;
