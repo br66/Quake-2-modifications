@@ -598,6 +598,9 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	self->client->quad_framenum = 0;
 	self->client->invincible_framenum = 0;
 	self->client->moongravity_framenum = 0; //NEW
+	self->client->hominggrenade_framenum = 0;
+	self->client->lightspeed_framenum = 0;
+	self->client->proximity_framenum = 0;
 	self->client->breather_framenum = 0;
 	self->client->enviro_framenum = 0;
 	self->flags &= ~FL_POWER_ARMOR;
@@ -1924,7 +1927,8 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	//think slowly
 	//gi.centerprintf(
 
-	gi.centerprintf(ent, "%f, %f, %f", ent->s.origin[0], ent->s.origin[1], ent->s.origin[2]);
+	///gi.centerprintf(ent, "%f, %f, %f", ent->s.origin[0], ent->s.origin[1], ent->s.origin[2]);
+	gi.centerprintf(ent, "%f", ent->client->grenade_flag);
 }
 
 

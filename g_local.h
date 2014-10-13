@@ -942,6 +942,9 @@ struct gclient_s
 	float		quad_framenum;
 	float		invincible_framenum;
 	float		moongravity_framenum; //NEW
+	float		hominggrenade_framenum; //ALSO NEW
+	float		lightspeed_framenum; //YES NEW
+	float		proximity_framenum; //ALL THE NEW
 	float		breather_framenum;
 	float		enviro_framenum;
 

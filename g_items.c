@@ -430,6 +430,78 @@ void	Use_MoonGravity (edict_t *ent, gitem_t *item) //NEW
 	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
 }
 
+void	Use_Homing (edict_t *ent, gitem_t *item) //NEW
+{
+	ent->client->pers.inventory[ITEM_INDEX(item)]--;
+	ValidateSelectedItem (ent);
+
+	if (ent->client->grenade_flag != 5)
+		ent->client->grenade_flag = 5;
+	else
+		ent->client->grenade_flag = 5;
+
+
+	if (ent->client->hominggrenade_framenum > level.framenum)
+	{
+		ent->client->hominggrenade_framenum += 300;
+		ent->client->grenade_flag = 5;
+	}
+	else
+	{
+		ent->client->hominggrenade_framenum = level.framenum + 300;
+		ent->client->grenade_flag = 5;
+	}
+	
+	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
+	ent->client->grenade_flag = 5;
+}
+
+void	Use_LightSpeed (edict_t *ent, gitem_t *item) //NEW
+{
+	//sv_gravity->value = 200;
+
+	if (ent->client->grenade_flag != 2)
+		ent->client->grenade_flag = 2;
+
+	gi.centerprintf(ent, "grenade flag 2");
+
+	ent->client->pers.inventory[ITEM_INDEX(item)]--;
+	ValidateSelectedItem (ent);
+
+	if (ent->client->lightspeed_framenum > level.framenum)
+	{
+		ent->client->lightspeed_framenum += 300;
+	}
+	else
+	{
+		ent->client->lightspeed_framenum = level.framenum + 300;
+	}
+	
+	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
+}
+
+void	Use_Proximity (edict_t *ent, gitem_t *item) //NEW
+{
+	if (ent->client->grenade_flag != 3)
+		ent->client->grenade_flag = 3;
+
+	gi.centerprintf(ent, "grenade flag 3");
+
+	ent->client->pers.inventory[ITEM_INDEX(item)]--;
+	ValidateSelectedItem (ent);
+
+	if (ent->client->proximity_framenum > level.framenum)
+	{
+		ent->client->proximity_framenum += 300;
+	}
+	else
+	{
+		ent->client->proximity_framenum = level.framenum + 300;
+	}
+	
+	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect.wav"), 1, ATTN_NORM, 0);
+}
+
 void	Use_IncSpeed (edict_t *ent, gitem_t *item) //SCRAPPED, CAN'T FIND PLAYER SPEED
 {
 	//ent->speed = 5000; 
@@ -1389,24 +1461,24 @@ always owned, never in the world
 /* precache */ "weapons/shotgf1b.wav weapons/shotgr1b.wav"
 	},
 
-/*QUAKED weapon_supershotgun (.3 .3 1) (-16 -16 -16) (16 16 16)
+/*QUAKED xxx Homing Grenade Flag xxx (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
 		"weapon_supershotgun", 
-		Pickup_Weapon,
-		Use_Weapon,
-		Drop_Weapon,
-		Weapon_SuperShotgun,
+		Pickup_Powerup,
+		Use_Homing,
+		Drop_General,
+		NULL,
 		"misc/w_pkup.wav",
 		"models/weapons/g_shotg2/tris.md2", EF_ROTATE,
 		"models/weapons/v_shotg2/tris.md2",
 /* icon */		"w_sshotgun",
-/* pickup */	"Super Shotgun",
-		0,
+/* pickup */	"Homing Grenade Powerup",
 		2,
-		"Shells",
-		IT_WEAPON|IT_STAY_COOP,
-		WEAP_SUPERSHOTGUN,
+		300,
+		NULL,
+		IT_POWERUP,
+		0,
 		NULL,
 		0,
 /* precache */ "weapons/sshotf1b.wav"
@@ -1435,7 +1507,7 @@ always owned, never in the world
 /* precache */ "weapons/machgf1b.wav weapons/machgf2b.wav weapons/machgf3b.wav weapons/machgf4b.wav weapons/machgf5b.wav"
 	},
 
-/*QUAKED weapon_chaingun (.3 .3 1) (-16 -16 -16) (16 16 16)
+/*QUAKED MOON GRAVITY (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
 		"weapon_chaingun", 

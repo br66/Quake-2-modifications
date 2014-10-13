@@ -28,6 +28,9 @@ void MoveClientToIntermission (edict_t *ent)
 	ent->client->quad_framenum = 0;
 	ent->client->invincible_framenum = 0;
 	ent->client->moongravity_framenum = 0; //NEW
+	ent->client->hominggrenade_framenum = 0; //ALSO NEW
+	ent->client->lightspeed_framenum = 0;
+	ent->client->proximity_framenum = 0;
 	ent->client->breather_framenum = 0;
 	ent->client->enviro_framenum = 0;
 	ent->client->grenade_blew_up = false;
@@ -453,6 +456,17 @@ void G_SetStats (edict_t *ent)
 		// I REALLY didn't want to have to put this here; it makes the code unorganized.
 		// Unlike, the Use Moon Gravity function, this one is called every frame.
 	}
+
+	if (ent->client->hominggrenade_framenum > level.framenum)
+	{
+		ent->client->grenade_flag = 5;
+		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
+		ent->client->ps.stats[STAT_TIMER] = (ent->client->hominggrenade_framenum - level.framenum)/10;
+	}
+	else if (ent->client->hominggrenade_framenum < level.framenum)
+	{
+		ent->client->grenade_flag = 0;
+	}
 	else if (ent->client->enviro_framenum > level.framenum)
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_envirosuit");
@@ -463,11 +477,50 @@ void G_SetStats (edict_t *ent)
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_rebreather");
 		ent->client->ps.stats[STAT_TIMER] = (ent->client->breather_framenum - level.framenum)/10;
 	}
+	//else if (ent->client->lightspeed_framenum > level.framenum)
+	//{
+		//ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
+		//ent->client->ps.stats[STAT_TIMER] = (ent->client->lightspeed_framenum - level.framenum)/10;
+	//}
+	//else if (ent->client->lightspeed_framenum < level.framenum)
+	//{
+		//ent->client->grenade_flag = 0;
+	//}
+
+	//if (ent->client->proximity_framenum > level.framenum)
+	//{
+		//ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
+		//ent->client->ps.stats[STAT_TIMER] = (ent->client->proximity_framenum - level.framenum)/10;
+	//}
+	//else if (ent->client->proximity_framenum < level.framenum)
+	//{
+		//ent->client->grenade_flag = 0;
+	//}
 	else
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = 0;
 		ent->client->ps.stats[STAT_TIMER] = 0;
 	}
+
+	//if (ent->client->lightspeed_framenum > level.framenum)
+	//{
+		//ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
+		//ent->client->ps.stats[STAT_TIMER] = (ent->client->lightspeed_framenum - level.framenum)/10;
+	//}
+	//else if (ent->client->lightspeed_framenum < level.framenum)
+	//{
+		//ent->client->grenade_flag = 0;
+	//}
+
+	//if (ent->client->proximity_framenum > level.framenum)
+	//{
+		//ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
+		//ent->client->ps.stats[STAT_TIMER] = (ent->client->proximity_framenum - level.framenum)/10;
+	//}
+	//else if (ent->client->proximity_framenum < level.framenum)
+	//{
+		//ent->client->grenade_flag = 0;
+	//}
 
 	//
 	// selected item

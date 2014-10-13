@@ -140,8 +140,8 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		( !deathmatch->value || other->client->pers.weapon == FindItem("blaster") ) )
 		other->client->newweapon = ent->item;
 
-	other->client->grenade_flag = 4;
-	gi.centerprintf(other, "FLASH DODGEBALL ACTIVATED");
+	//other->client->grenade_flag = 4;
+	//gi.centerprintf(other, "FLASH DODGEBALL ACTIVATED");
 
 	return true;
 }
@@ -272,24 +272,24 @@ void NoAmmoWeaponChange (edict_t *ent)
 		//ent->client->newweapon = FindItem ("chaingun");
 		//return;
 	//}
-	if ( ent->client->pers.inventory[ITEM_INDEX(FindItem("Shells"))]
-		&&  ent->client->pers.inventory[ITEM_INDEX(FindItem("machinegun"))] )
-	{
-		ent->client->newweapon = FindItem ("machinegun");
-		return;
-	}
-	if ( ent->client->pers.inventory[ITEM_INDEX(FindItem("shells"))] > 1
-		&&  ent->client->pers.inventory[ITEM_INDEX(FindItem("super shotgun"))] )
-	{
-		ent->client->newweapon = FindItem ("super shotgun");
-		return;
-	}
-	if ( ent->client->pers.inventory[ITEM_INDEX(FindItem("shells"))]
-		&&  ent->client->pers.inventory[ITEM_INDEX(FindItem("shotgun"))] )
-	{
-		ent->client->newweapon = FindItem ("shotgun");
-		return;
-	}
+	//if ( ent->client->pers.inventory[ITEM_INDEX(FindItem("Shells"))]
+		//&&  ent->client->pers.inventory[ITEM_INDEX(FindItem("machinegun"))] )
+	//{
+		//ent->client->newweapon = FindItem ("machinegun");
+		//return;
+	//}
+	//if ( ent->client->pers.inventory[ITEM_INDEX(FindItem("shells"))] > 1
+		//&&  ent->client->pers.inventory[ITEM_INDEX(FindItem("super shotgun"))] )
+	//{
+		//ent->client->newweapon = FindItem ("super shotgun");
+		//return;
+	//}
+	//if ( ent->client->pers.inventory[ITEM_INDEX(FindItem("shells"))]
+		//&&  ent->client->pers.inventory[ITEM_INDEX(FindItem("shotgun"))] )
+	//{
+		//ent->client->newweapon = FindItem ("shotgun");
+		//return;
+	//}
 	ent->client->newweapon = FindItem ("blaster");
 }
 
@@ -597,14 +597,20 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	else if(ent->client->grenade_flag == 3)
 	{
 		fire_grenadeprox(ent, start, forward, 1000, speed, timer, radius, held);
-		gi.centerprintf(ent, "PROX");
+		gi.centerprintf(ent, "proximity");
 	}
 	else if (ent->client->grenade_flag == 4)
 	{
-		fire_greFlash (ent, start, forward, 1000, speed, timer, radius); //--NAME CHANGE
+		fire_greFlash (ent, start, forward, 1000, speed, timer, radius);
+	}
+	else if (ent->client->grenade_flag == 5)
+	{
+		Fire_Homing_Grenade (ent, start, forward, damage, speed, radius);
+		gi.centerprintf(ent, "homing");
 	}
 	else
 		fire_grenade2 (ent, start, forward, 1000, speed += 20, timer, radius, held); //orig. damage
+
 	//if flag = fire regular grenade
 	//if grenade_flag = 0 (firegrenade2)
 	//if flag = fire homing grenade
@@ -642,7 +648,116 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 void Weapon_GrenadeFlash (edict_t *ent)
 {
 	ent->client->grenade_flag = 4;
-	gi.centerprintf(ent, "flash");
+	gi.centerprintf(ent, "using flash grenade");
+
+	if ((ent->client->newweapon) && (ent->client->weaponstate == WEAPON_READY))
+	{
+		ChangeWeapon (ent);
+		return;
+	}
+
+	if (ent->client->weaponstate == WEAPON_ACTIVATING)
+	{
+		ent->client->weaponstate = WEAPON_READY;
+		ent->client->ps.gunframe = 16;
+		return;
+	}
+
+	if (ent->client->weaponstate == WEAPON_READY)
+	{
+		if ( ((ent->client->latched_buttons|ent->client->buttons) & BUTTON_ATTACK) )
+		{
+			ent->client->latched_buttons &= ~BUTTON_ATTACK;
+			if (ent->client->pers.inventory[ent->client->ammo_index])
+			{
+				ent->client->ps.gunframe = 1;
+				ent->client->weaponstate = WEAPON_FIRING;
+				ent->client->grenade_time = 0;
+			}
+			else
+			{
+				if (level.time >= ent->pain_debounce_time)
+				{
+					gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/noammo.wav"), 1, ATTN_NORM, 0);
+					ent->pain_debounce_time = level.time + 1;
+				}
+				NoAmmoWeaponChange (ent);
+			}
+			return;
+		}
+
+		if ((ent->client->ps.gunframe == 29) || (ent->client->ps.gunframe == 34) || (ent->client->ps.gunframe == 39) || (ent->client->ps.gunframe == 48))
+		{
+			if (rand()&15)
+				return;
+		}
+
+		if (++ent->client->ps.gunframe > 48)
+			ent->client->ps.gunframe = 16;
+		return;
+	}
+
+	if (ent->client->weaponstate == WEAPON_FIRING)
+	{
+		if (ent->client->ps.gunframe == 5)
+			gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/hgrena1b.wav"), 1, ATTN_NORM, 0);
+
+		if (ent->client->ps.gunframe == 11)
+		{
+			if (!ent->client->grenade_time)
+			{
+				ent->client->grenade_time = level.time + ALT_GRENADE_TIMER + 0.2;
+				ent->client->weapon_sound = gi.soundindex("weapons/hgrenc1b.wav");
+			}
+
+			// they waited too long, detonate it in their hand
+			if (!ent->client->grenade_blew_up && level.time >= ent->client->grenade_time)
+			{
+				ent->client->weapon_sound = 0;
+				weapon_grenade_fire (ent, true);
+				ent->client->grenade_blew_up = true;
+			}
+
+			if (ent->client->buttons & BUTTON_ATTACK)
+				return;
+
+			if (ent->client->grenade_blew_up)
+			{
+				if (level.time >= ent->client->grenade_time)
+				{
+					ent->client->ps.gunframe = 15;
+					ent->client->grenade_blew_up = false;
+				}
+				else
+				{
+					return;
+				}
+			}
+		}
+
+		if (ent->client->ps.gunframe == 12)
+		{
+			ent->client->weapon_sound = 0;
+			weapon_grenade_fire (ent, false);
+		}
+
+		if ((ent->client->ps.gunframe == 15) && (level.time < ent->client->grenade_time))
+			return;
+
+		ent->client->ps.gunframe++;
+
+		if (ent->client->ps.gunframe == 16)
+		{
+			ent->client->grenade_time = 0;
+			ent->client->weaponstate = WEAPON_READY;
+		}
+	}
+}
+
+void Weapon_GrenadeHoming (edict_t *ent)
+{
+	//ent->client->grenade_flag = 4;
+	//gi.centerprintf(ent, "flash");
 
 	if ((ent->client->newweapon) && (ent->client->weaponstate == WEAPON_READY))
 	{
