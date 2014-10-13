@@ -641,6 +641,8 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 
 void Weapon_Grenade (edict_t *ent)
 {
+	//ent->client->dblauncher_flag = 0;
+
 	if ((ent->client->newweapon) && (ent->client->weaponstate == WEAPON_READY))
 	{
 		ChangeWeapon (ent);
@@ -746,11 +748,6 @@ void Weapon_Grenade (edict_t *ent)
 }
 
 
-
-
-
-
-
 /*
 ======================================================================
 
@@ -802,6 +799,20 @@ void Weapon_GrenadeLauncher (edict_t *ent)
 {
 	static int	pause_frames[]	= {34, 51, 59, 0};
 	static int	fire_frames[]	= {6, 0};
+
+	ent->client->dblauncher_flag = 0;
+	gi.centerprintf(ent, "not fireworks");
+
+	Weapon_Generic (ent, 5, 16, 59, 64, pause_frames, fire_frames, weapon_grenadelauncher_fire);
+}
+
+void Weapon_GrenadeFireworks (edict_t *ent)
+{
+	static int	pause_frames[]	= {34, 51, 59, 0};
+	static int	fire_frames[]	= {6, 0};
+
+	ent->client->dblauncher_flag = 1;
+	gi.centerprintf(ent, "fireworks");
 
 	Weapon_Generic (ent, 5, 16, 59, 64, pause_frames, fire_frames, weapon_grenadelauncher_fire);
 }

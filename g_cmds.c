@@ -1048,7 +1048,11 @@ void ClientCommand (edict_t *ent)
 	else if (Q_stricmp(cmd, "playerlist") == 0)
 		Cmd_PlayerList_f(ent);
 	else if (Q_stricmp (cmd, "dodgeright") == 0) //NEW
-		Q_DodgeRight(ent, 20);
+		Q_DodgeRight(ent, 7);
+	else if (Q_stricmp (cmd, "dodgeleft") == 0) //NEW
+		Q_DodgeLeft (ent, -7);
+	else if (Q_stricmp (cmd, "dash") == 0) //NEW
+		Q_Dash (ent, 7);
 	else if (Q_stricmp (cmd, "lightspeed") == 0)
 	{
 		ent->client->grenade_flag = 2;

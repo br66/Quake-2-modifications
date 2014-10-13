@@ -359,8 +359,7 @@ void Q_DodgeRight (edict_t *ent, int knockback)
 	vec3_t	kvel;
 	vec3_t	forward, right, up;
 
-	AngleVectors (ent->s.angles, forward, right, up); //MAYBE I SHOULDN'T BE ANGLING VECTORS HERE? DOES IT HAVE SOMETHING TO DO W/ THE ANGLES?
-	//gi.centerprintf(ent,"dodge: %d, %d, %d",ent->client->ps.pmove.velocity[0],ent->client->ps.pmove.velocity[1],ent->client->ps.pmove.velocity[2]);
+	AngleVectors (ent->s.angles, forward, right, up); 
 	VectorScale (right, 4000.0 * (float)knockback / 50, kvel);
 	//VectorAdd (ent->client->ps.pmove.velocity, kvel, ent->client->ps.pmove.velocity);
 
@@ -368,6 +367,35 @@ void Q_DodgeRight (edict_t *ent, int knockback)
 	ent->velocity[1] += (short)kvel[1];
 	ent->velocity[2] += (short)kvel[2];
 }
+
+void Q_DodgeLeft (edict_t *ent, int knockback)
+{
+	vec3_t	kvel;
+	vec3_t	forward, right, up;
+
+	AngleVectors (ent->s.angles, forward, right, up);
+	VectorScale (right, 4000.0 * (float)knockback / 50, kvel);
+	//VectorAdd (ent->client->ps.pmove.velocity, kvel, ent->client->ps.pmove.velocity);
+
+	ent->velocity[0] += (short)kvel[0];
+	ent->velocity[1] += (short)kvel[1];
+	ent->velocity[2] += (short)kvel[2];
+}
+
+void Q_Dash (edict_t *ent, int knockback)
+{
+	vec3_t	kvel;
+	vec3_t	forward, right, up;
+
+	AngleVectors (ent->s.angles, forward, right, up);
+	VectorScale (forward, 4000.0 * (float)knockback / 50, kvel);
+	//VectorAdd (ent->client->ps.pmove.velocity, kvel, ent->client->ps.pmove.velocity);
+
+	ent->velocity[0] += (short)kvel[0];
+	ent->velocity[1] += (short)kvel[1];
+	ent->velocity[2] += (short)kvel[2];
+}
+
 void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir, vec3_t point, vec3_t normal, int damage, int knockback, int dflags, int mod)
 {
 	gclient_t	*client;

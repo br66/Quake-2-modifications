@@ -14,6 +14,7 @@ void Weapon_Chaingun (edict_t *ent);
 void Weapon_HyperBlaster (edict_t *ent);
 void Weapon_RocketLauncher (edict_t *ent);
 void Weapon_Grenade (edict_t *ent);
+void Weapon_GrenadeFireworks (edict_t *ent);
 void Weapon_GrenadeLauncher (edict_t *ent);
 void Weapon_Railgun (edict_t *ent);
 void Weapon_BFG (edict_t *ent);
@@ -1521,30 +1522,30 @@ always owned, never in the world
 /* precache */ "models/objects/rocket/tris.md2 weapons/rockfly.wav weapons/rocklf1a.wav weapons/rocklr1b.wav models/objects/debris2/tris.md2"
 	},
 
-/*QUAKED weapon_hyperblaster (.3 .3 1) (-16 -16 -16) (16 16 16)
+/*QUAKED weapon_FIREWORKS (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
 		"weapon_hyperblaster", 
 		Pickup_Weapon,
 		Use_Weapon,
 		Drop_Weapon,
-		Weapon_HyperBlaster,
+		Weapon_GrenadeFireworks,
 		"misc/w_pkup.wav",
 		"models/weapons/g_hyperb/tris.md2", EF_ROTATE,
-		"models/weapons/v_hyperb/tris.md2",
-/* icon */		"w_hyperblaster",
-/* pickup */	"HyperBlaster",
+		"models/weapons/v_launch/tris.md2",
+/* icon */		"w_glauncher",
+/* pickup */	"Fireworks",
 		0,
 		1,
-		"Cells",
+		"Grenades",
 		IT_WEAPON|IT_STAY_COOP,
-		WEAP_HYPERBLASTER,
+		WEAP_GRENADELAUNCHER,
 		NULL,
 		0,
-/* precache */ "weapons/hyprbu1a.wav weapons/hyprbl1a.wav weapons/hyprbf1a.wav weapons/hyprbd1a.wav misc/lasfly.wav"
+/* precache */ "models/objects/grenade/tris.md2 weapons/grenlf1a.wav weapons/grenlr1b.wav weapons/grenlb1b.wav"
 	},
 
-/*QUAKED weapon_railgun (.3 .3 1) (-16 -16 -16) (16 16 16)
+/*QUAKED weapon_DBOL (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
 		"weapon_railgun", //orig. weapon_railgun 
@@ -1556,7 +1557,7 @@ always owned, never in the world
 		"models/weapons/g_rail/tris.md2", EF_ROTATE,
 		"models/weapons/v_rail/tris.md2",
 /* icon */		"w_bfg",
-/* pickup */	"BFG10K",
+/* pickup */	"BFG1",
 		0,
 		50,
 		"Cells",
