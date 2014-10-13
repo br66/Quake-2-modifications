@@ -495,7 +495,7 @@ void TossClientWeapon (edict_t *self)
 		drop->spawnflags = DROPPED_PLAYER_ITEM;
 	}
 
-	if (quad) //WTF IS QUAD
+	if (quad)
 	{
 		self->client->v_angle[YAW] += spread;
 		drop = Drop_Item (self, FindItemByClassname ("item_quad"));
@@ -1356,6 +1356,36 @@ void ClientBeginDeathmatch (edict_t *ent)
 }
 
 
+void itemCreator2 (char *classname, vec3_t position)
+{
+	gitem_t	*item;			//whatever classname given will be attached to this item pointer
+	edict_t	*entityItem;	//the item's classname will be given to the entity
+	vec3_t	angles;			//to create rotation effect
+
+	item = FindItemByClassname(classname); //should this be &classname????
+	if(!item) //if item pointer points to something that does not exist, it is a null pointer; don't do shit
+		return;
+
+	entityItem = G_Spawn();
+	entityItem->item = item;
+	VectorCopy (position, entityItem->s.origin);
+	entityItem->s.origin[2] += 15;
+	VectorSet (entityItem->mins, -15,-15,-15); //mininmum size of item entity???
+	VectorSet(entityItem->maxs, -15,-15,-15); //maximum size of entity???
+	entityItem->solid = SOLID_TRIGGER;
+	entityItem->touch = Touch_Item;
+	gi.setmodel(entityItem, entityItem->item->world_model);
+
+	entityItem->s.effects = entityItem->item->world_model_flags;	//FIND MY SPECIAL EFFECTS USUALLY ATTACHED TO THIS ITEM
+	entityItem->s.renderfx = RF_GLOW;								//LIKE ALL ITEMS, GLOW
+
+	angles[0] = 0;
+    angles[1] = rand() % 360; //THIS WILL MAKE IT ROTATE ON THE Y AXIS
+    angles[2] = 0;
+
+	gi.linkentity(entityItem);
+}
+
 /*
 ===========
 ClientBegin
@@ -1411,6 +1441,8 @@ void ClientBegin (edict_t *ent)
 			gi.WriteShort (ent-g_edicts);
 			gi.WriteByte (MZ_LOGIN);
 			gi.multicast (ent->s.origin, MULTICAST_PVS);
+
+			//itemCreator2("item_moongravity", homGrenadeLoc);
 
 			gi.bprintf (PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
 		}
@@ -1681,6 +1713,13 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	edict_t	*other;
 	int		i, j;
 	pmove_t	pm;
+	
+	int		moongravity;
+	vec3_t	homGrenadeLoc;
+	homGrenadeLoc[0] = 407;
+	homGrenadeLoc[1] = 538;
+	homGrenadeLoc[2] = 528;
+
 
 	level.current_entity = ent;
 	client = ent->client;
@@ -1803,8 +1842,14 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		if (ucmd->forwardmove != 0 || ucmd->sidemove != 0 && ent->svflags & SVF_NOCLIENT)
 		{
 			ent->svflags &= ~SVF_NOCLIENT;
-			gi.centerprintf(ent, "%d", ent->client->grenade_flag);
+			//gi.centerprintf(ent, "%d", ent->client->grenade_flag);
 		}
+
+		//if (moongravity == 0)
+		//{
+			//itemCreator2("item_moongravity", homGrenadeLoc);
+			//moongravity = 1;
+		//}
 
 		gi.linkentity (ent);
 
@@ -1878,6 +1923,8 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	//client think delay == 100;
 	//think slowly
 	//gi.centerprintf(
+
+	gi.centerprintf(ent, "%f, %f, %f", ent->s.origin[0], ent->s.origin[1], ent->s.origin[2]);
 }
 
 

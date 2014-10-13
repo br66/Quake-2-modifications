@@ -755,6 +755,8 @@ void player_pain (edict_t *self, edict_t *other, float kick, int damage);
 void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
 void player_playdead (edict_t *ent); //NEW
 
+void itemCreator2 (char *classname, vec3_t position);
+
 //
 // g_svcmds.c
 //

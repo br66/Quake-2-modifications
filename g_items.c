@@ -14,6 +14,7 @@ void Weapon_Chaingun (edict_t *ent);
 void Weapon_HyperBlaster (edict_t *ent);
 void Weapon_RocketLauncher (edict_t *ent);
 void Weapon_Grenade (edict_t *ent);
+void Weapon_GrenadeFlash (edict_t *ent);
 void Weapon_GrenadeFireworks (edict_t *ent);
 void Weapon_GrenadeLauncher (edict_t *ent);
 void Weapon_Railgun (edict_t *ent);
@@ -215,13 +216,15 @@ qboolean Pickup_Bandolier (edict_t *ent, edict_t *other)
 	if (other->client->pers.max_slugs < 75)
 		other->client->pers.max_slugs = 75;
 
-	item = FindItem("Bullets");
+	item = FindItem("Flash Grenades");
 	if (item)
 	{
+		item = FindItem("Grenades");
+
 		index = ITEM_INDEX(item);
 		other->client->pers.inventory[index] += item->quantity;
-		if (other->client->pers.inventory[index] > other->client->pers.max_bullets)
-			other->client->pers.inventory[index] = other->client->pers.max_bullets;
+		if (other->client->pers.inventory[index] > other->client->pers.max_grenades)
+			other->client->pers.inventory[index] = other->client->pers.max_grenades;
 	}
 
 	item = FindItem("Shells");
@@ -259,13 +262,15 @@ qboolean Pickup_Pack (edict_t *ent, edict_t *other)
 	if (other->client->pers.max_slugs < 100)
 		other->client->pers.max_slugs = 100;
 
-	item = FindItem("Bullets");
+	item = FindItem("Flash Grenades");
 	if (item)
 	{
+		item = FindItem("Grenades");
+
 		index = ITEM_INDEX(item);
 		other->client->pers.inventory[index] += item->quantity;
-		if (other->client->pers.inventory[index] > other->client->pers.max_bullets)
-			other->client->pers.inventory[index] = other->client->pers.max_bullets;
+		if (other->client->pers.inventory[index] > other->client->pers.max_grenades)
+			other->client->pers.inventory[index] = other->client->pers.max_grenades;
 	}
 
 	item = FindItem("Shells");
@@ -494,7 +499,7 @@ qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count)
 		return false;
 
 	if (item->tag == AMMO_BULLETS)
-		max = ent->client->pers.max_bullets;
+		max = ent->client->pers.max_grenades;
 	else if (item->tag == AMMO_SHELLS)
 		max = ent->client->pers.max_shells;
 	else if (item->tag == AMMO_ROCKETS)
@@ -1422,7 +1427,7 @@ always owned, never in the world
 /* pickup */	"Machinegun",
 		0,
 		1,
-		"Bullets",
+		"Shells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_MACHINEGUN,
 		NULL,
@@ -1434,23 +1439,23 @@ always owned, never in the world
 */
 	{
 		"weapon_chaingun", 
-		Pickup_Weapon,
-		Use_Weapon,
-		Drop_Weapon,
-		Weapon_Chaingun,
+		Pickup_Powerup,
+		Use_MoonGravity,
+		Drop_General,
+		NULL,
 		"misc/w_pkup.wav",
-		"models/weapons/g_chain/tris.md2", EF_ROTATE,
-		"models/weapons/v_chain/tris.md2",
-/* icon */		"w_chaingun",
-/* pickup */	"Chaingun",
+		"models/items/invulner/tris.md2", EF_ROTATE,
+		NULL,
+/* icon */		"p_invulnerability",
+/* pickup */	"Moon Gravity",
+		2,
+		300,
+		NULL,
+		IT_POWERUP,
 		0,
-		1,
-		"Bullets",
-		IT_WEAPON|IT_STAY_COOP,
-		WEAP_CHAINGUN,
 		NULL,
 		0,
-/* precache */ "weapons/chngnu1a.wav weapons/chngnl1a.wav weapons/machgf3b.wav` weapons/chngnd1a.wav"
+/* precache */ "items/protect.wav items/protect2.wav items/protect4.wav"
 	},
 
 /*QUAKED ammo_grenades (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -1618,27 +1623,27 @@ always owned, never in the world
 /* precache */ ""
 	},
 
-/*QUAKED ammo_bullets (.3 .3 1) (-16 -16 -16) (16 16 16)
+/*QUAKED ammo_flash (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
 		"ammo_bullets",
-		Pickup_Ammo,
-		NULL,
+		Pickup_Ammo, //does not give ammo
+		Use_Weapon,
 		Drop_Ammo,
-		NULL,
+		Weapon_GrenadeFlash,
 		"misc/am_pkup.wav",
-		"models/items/ammo/bullets/medium/tris.md2", 0,
-		NULL,
-/* icon */		"a_bullets",
-/* pickup */	"Bullets",
+		"models/items/ammo/grenades/medium/tris.md2", 0,
+		"models/weapons/v_handgr/tris.md2",
+/* icon */		"a_grenades",
+/* pickup */	"Flash Grenades",
 /* width */		3,
-		50,
+		5,
+		"grenades",
+		IT_AMMO|IT_WEAPON,
+		WEAP_GRENADES,
 		NULL,
-		IT_AMMO,
-		0,
-		NULL,
-		AMMO_BULLETS,
-/* precache */ ""
+		AMMO_GRENADES,
+/* precache */ "weapons/hgrent1a.wav weapons/hgrena1b.wav weapons/hgrenc1b.wav weapons/hgrenb1a.wav weapons/hgrenb2a.wav "
 	},
 
 /*QUAKED ammo_cells (.3 .3 1) (-16 -16 -16) (16 16 16)
