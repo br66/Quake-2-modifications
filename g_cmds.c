@@ -1053,11 +1053,11 @@ void ClientCommand (edict_t *ent)
 		Q_DodgeLeft (ent, -7);
 	else if (Q_stricmp (cmd, "dash") == 0) //NEW
 		Q_Dash (ent, 7);
-	else if (Q_stricmp (cmd, "lightspeed") == 0)
-	{
-		ent->client->grenade_flag = 2;
-		gi.centerprintf(ent, "GRENADE FLAG 2");
-	}
+	//else if (Q_stricmp (cmd, "lightspeed") == 0)
+	//{
+		//ent->client->grenade_flag = 2;
+		//gi.centerprintf(ent, "GRENADE FLAG 2");
+	//}
 	else if (Q_stricmp (cmd, "camo") == 0) //NEW
 	{
 		if (ent->svflags & SVF_NOCLIENT)
@@ -1071,24 +1071,25 @@ void ClientCommand (edict_t *ent)
 			//gi.centerprintf(ent, "invixible");
 		}
 	}
-	else if (Q_stricmp (cmd, "proximity") == 0)
-	{
-		ent->client->grenade_flag = 3;
-		gi.centerprintf(ent, "GRENADE FLAG 3");
-	}
-	else if (Q_stricmp (cmd, "fireworks") == 0)
-	{
-		ent->client->dblauncher_flag = 1;
-		gi.centerprintf(ent, "FIREWORKS");
-	}
-	else if (Q_stricmp (cmd, "homing") == 0)
-	{
-		ent->client->grenade_flag = 5;
-		gi.centerprintf (ent, "homing grenade");
-	}
+	//else if (Q_stricmp (cmd, "proximity") == 0)
+	//{
+		//ent->client->grenade_flag = 3;
+		//gi.centerprintf(ent, "GRENADE FLAG 3");
+	//}
+	//else if (Q_stricmp (cmd, "fireworks") == 0)
+	//{
+		//ent->client->dblauncher_flag = 1;
+		//gi.centerprintf(ent, "FIREWORKS");
+	//}
+	//else if (Q_stricmp (cmd, "homing") == 0)
+	//{
+		//ent->client->grenade_flag = 5;
+		//gi.centerprintf (ent, "homing grenade");
+	//}
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 
 	//I would say that if your pick-ups for the grenade types work, you should get rid of your UI commands  - Justin
+	//yeah probably
 
 }

@@ -1075,6 +1075,7 @@ void fire_grenadeprox (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 }
 
 //This is a grenade function yet you don't have the "Held" variable in the declaration. What happens if you try to hold your grenade?  - Justin
+//nothing -br66
 
 void fire_greFlash (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius)
 {
