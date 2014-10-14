@@ -1089,4 +1089,6 @@ void ClientCommand (edict_t *ent)
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 
+	//I would say that if your pick-ups for the grenade types work, you should get rid of your UI commands  - Justin
+
 }

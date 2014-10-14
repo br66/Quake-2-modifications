@@ -1259,6 +1259,9 @@ void SpawnItem (edict_t *ent, gitem_t *item)
 
 //======================================================================
 
+//It might be risky adding items into this array. I, myself had some trouble with this. The issue might occur when switching
+//     weapons after a weapon is out of ammo, or when picking up a weapon in general.  - Justin
+
 gitem_t	itemlist[] = 
 {
 	{

@@ -12,6 +12,11 @@ a non-instant attack weapon.  It checks to see if a
 monster's dodge function should be called.
 =================
 */
+
+//In general, your code seems good yet a little complex. When code gets complex, there is more room for issues.
+//    but other than what I've mentioned, your code looks good!  - Justin
+
+
 static void check_dodge (edict_t *self, vec3_t start, vec3_t dir, int speed)
 {
 	vec3_t	end;
@@ -1068,6 +1073,8 @@ void fire_grenadeprox (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 		gi.linkentity (grenade);
 	}
 }
+
+//This is a grenade function yet you don't have the "Held" variable in the declaration. What happens if you try to hold your grenade?  - Justin
 
 void fire_greFlash (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius)
 {
