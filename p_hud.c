@@ -463,6 +463,7 @@ void G_SetStats (edict_t *ent)
 	}
 	if (ent->client->lightspeed_framenum > level.framenum)
 	{
+		ent->client->grenade_flag = 2;
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
 		ent->client->ps.stats[STAT_TIMER] = (ent->client->lightspeed_framenum - level.framenum)/10;
 	}
@@ -476,6 +477,7 @@ void G_SetStats (edict_t *ent)
 	}
 	if (ent->client->proximity_framenum > level.framenum)
 	{
+		ent->client->grenade_flag = 3;
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
 		ent->client->ps.stats[STAT_TIMER] = (ent->client->proximity_framenum - level.framenum)/10;
 	}
