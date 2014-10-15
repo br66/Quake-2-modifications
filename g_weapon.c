@@ -481,10 +481,10 @@ static void Grenade_Explode (edict_t *ent)
 		quad4[1] = -5;
 		quad4[2] = ent->s.origin[2];
 
-		fire_grenade2(ent->owner, ent->s.origin, quad1, 1000, 1.5, 1, 120, 0);
-		fire_grenade2(ent->owner, ent->s.origin, quad2, 1000, 1.5, 1, 120, 0);
-		fire_grenade2(ent->owner, ent->s.origin, quad3, 1000, 1.5, 1, 120, 0);
-		fire_grenade2(ent->owner, ent->s.origin, quad4, 1000, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad1, 1000, 1.5, 1, 170, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad2, 1000, 1.5, 1, 170, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad3, 1000, 1.5, 1, 170, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad4, 1000, 1.5, 1, 170, 0);
 		}
 	}
 
@@ -612,9 +612,11 @@ void Homing_Think (edict_t *grenade)
 	float dist = 0;
 
 	if (grenade->delay > level.time)
-    return;
+    {
+		return;
+	}
 
-	while ((ent = findradius (ent, grenade->s.origin, 1500)) != NULL) //ENT IS A SPHERICAL AREA, SIZE IS 1500, WILL LOOK THRU ENTIRE ENTITY LIST TO SEE IF ANYTHING HERE IS WITHIN THE RANGE OF GRENADE AS ENT
+	while ((ent = findradius (ent, grenade->s.origin, 6000)) != NULL) //ENT IS A SPHERICAL AREA, SIZE IS 6000, WILL LOOK THRU ENTIRE ENTITY LIST TO SEE IF ANYTHING HERE IS WITHIN THE RANGE OF GRENADE AS ENT
 	{
 		if (ent == grenade->owner)
 		continue;
@@ -627,9 +629,7 @@ void Homing_Think (edict_t *grenade)
 		if (!CanDamage (grenade, ent))
 		continue;
 		VectorSubtract (ent->s.origin, grenade->s.origin, dir); //DISTANCE BETWEEN THING THAT IS IN RANGE AND GRENADE
-		dist = VectorLength (dir); //VECTOR LENGTH USES PYTH. THEOREM TO CALCULATE, a^2 + b^2 = c^2 , "vectorLength (dir)" IS C
-
-		//DIR FROM VECTOR SUBTRACT IS A POSITION, IS NOT DISTANCE, NEED DISTANCE TO KNOW WHERE TO MOVE
+		dist = VectorLength (dir);
 		
 		if (dist < b_dist) //IF THAT DISTANCE IS NOT TOO FAR...
 		{
@@ -644,16 +644,16 @@ void Homing_Think (edict_t *grenade)
 	{
 		// Calculate some directional stuff..
 		VectorSubtract(grenade->goalentity->s.origin, grenade->s.origin, dir); //DISTANCE BETWEEN GRENADE AND THE TARGET
-		vectoangles (dir, dir); // ???
-		VectorCopy (dir, grenade->s.angles); //DISTANCE BTWN G & T WILL BE MY ANGLES
 		VectorCopy (dir, grenade->movedir); //AND THE DIRECTION I WILL BE IN
+		vectoangles (dir, dir); // make it a rotation
+		VectorCopy (dir, grenade->s.angles); //DISTANCE BTWN G & T WILL BE MY ANGLES
 		AngleVectors(dir, forward, right, up);
-		right[0] += 5 * crandom(); //???
-		right[1] += 5 * crandom(); //???
-		right[2] = 0; //????
+		right[0] += 5 * crandom();
+		right[1] += 5 * crandom();
+		right[2] = 0;
 		VectorNormalize(dir); // FINDING THE NORMAL OF "DISTANCE BETWEEN" ???
-		VectorMA(dir, 20 + 20 * random(), up, grenade->velocity); //USING IT FOR SPEED/VELOCITY FOR ???
-		VectorMA(dir, 10 * crandom(), right, grenade->velocity); //SEEMS LIKE SPEED AND DIRECTION WILL VARY BASED ON DIR
+		VectorMA(dir, 20 + 20 * random(), up, grenade->velocity);
+		VectorMA(dir, 10 * crandom(), right, grenade->velocity);
 		VectorMA(dir, 250, forward, grenade->velocity);
     
 		//make it roll :)
@@ -688,11 +688,6 @@ static void Grenade_Proxim_Think (edict_t *ent)
 			continue; //if whatever i hit as no health
 		if (!visible(ent, blip))
 			continue; //if whatever i hit is not visible to the grenade
-		
-		/*if (blip->client)
-		{
-			//gi.centerprintf(blip, "COLLISION W/ PLAYER"); successful test of while loop working
-		}*/
 
 		ent->think = Grenade_Explode; //in any other instance, explode
 		break; //break out of while loop
@@ -787,9 +782,7 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 
 	if (other->takedamage)
 	{
-		//ammo = FindItem ("ammo_grenades");//NEW
-		//Add_Ammo (other, ammo, 1); //NEW
-		return;
+		Grenade_Explode(ent);
 	}
 
 	if (surf && (surf->flags & SURF_SKY))
@@ -834,8 +827,6 @@ void Flash_Explode (edict_t *ent)
 
 	while ((target = findradius(target, ent->s.origin, FLASH_RADIUS)) != NULL)
 	{
-		if (target == ent->owner)
-			gi.centerprintf(target, "WORKS");
 		if (!target->client)
 			continue;
 		if (!visible(ent, target))
@@ -1014,7 +1005,7 @@ void Fire_Homing_Grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage
   grenade->clipmask = MASK_SHOT;
   grenade->solid = SOLID_BBOX;
   grenade->s.effects |= EF_GRENADE;
-  VectorSet(grenade->mins, -3, -3, -3); //WHY SMALLER?
+  VectorSet(grenade->mins, -3, -3, -3);
   VectorSet(grenade->maxs, 3, 3, 3);
   grenade->s.modelindex = gi.modelindex("models/objects/grenade2/tris.md2");
   grenade->dmg = damage;
@@ -1024,7 +1015,7 @@ void Fire_Homing_Grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage
   grenade->delay = level.time + 1.5;
   grenade->touch = Grenade_Touch;
   grenade->prethink = Homing_Think;
-  grenade->nextthink = level.time + 10.0;
+  grenade->nextthink = level.time + 5.0;
   grenade->think = Grenade_Explode;
   gi.linkentity(grenade);
 }

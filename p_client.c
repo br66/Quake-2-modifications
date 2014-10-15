@@ -1666,7 +1666,7 @@ void PrintPmove (pmove_t *pm)
 	Com_Printf ("sv %3i:%i %i\n", pm->cmd.impulse, c1, c2);
 }
 
-edict_t *highEnt = NULL;
+edict_t *highEnt = NULL; //um... this doesn't look right...
 
 void GetHighScorer (void) //SCRAPPED FUNCTION
 {
@@ -1719,26 +1719,23 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	
 	int		moongravity;
 	vec3_t	homGrenadeLoc;
-	homGrenadeLoc[0] = 407;
-	homGrenadeLoc[1] = 538;
-	homGrenadeLoc[2] = 528;
+	//homGrenadeLoc[0] = 407;
+	//homGrenadeLoc[1] = 538;
+	//homGrenadeLoc[2] = 528;
 
 
 	level.current_entity = ent;
 	client = ent->client;
 
 	GetHighScorer(); //each frame and each second? souns a bit redundant
-	//gi.centerprintf(ent, "moving");
 
 	if(highEnt == ent) //if i have the high score
 	{
 		vec3_t particles;
 		VectorCopy (ent->s.origin, particles);
 		//particles[0] += 128;
-		particles[2] += 64; //move the y a little above player
-		gi.centerprintf(ent, "STABLE");
-		gi.centerprintf(highEnt, "STABLEW");
-		G_Spawn_Splash(TE_LASER_SPARKS, 8, 0xe2e5e3e6, particles, ent->s.origin);
+		//particles[2] += 64; //move y a little above player
+		//G_Spawn_Splash(TE_LASER_SPARKS, 8, 0xe2e5e3e6, particles, ent->s.origin);
 	}
 
 	if (level.intermissiontime)
@@ -1842,17 +1839,11 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			VectorCopy (pm.viewangles, client->ps.viewangles);
 		}
 
+		//ends camoflauge if player has moved
 		if (ucmd->forwardmove != 0 || ucmd->sidemove != 0 && ent->svflags & SVF_NOCLIENT)
 		{
 			ent->svflags &= ~SVF_NOCLIENT;
-			//gi.centerprintf(ent, "%d", ent->client->grenade_flag);
 		}
-
-		//if (moongravity == 0)
-		//{
-			//itemCreator2("item_moongravity", homGrenadeLoc);
-			//moongravity = 1;
-		//}
 
 		gi.linkentity (ent);
 
@@ -1928,7 +1919,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	//gi.centerprintf(
 
 	///gi.centerprintf(ent, "%f, %f, %f", ent->s.origin[0], ent->s.origin[1], ent->s.origin[2]);
-	gi.centerprintf(ent, "%d", ent->client->grenade_flag);
 }
 
 

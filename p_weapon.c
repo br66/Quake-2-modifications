@@ -140,9 +140,6 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		( !deathmatch->value || other->client->pers.weapon == FindItem("blaster") ) )
 		other->client->newweapon = ent->item;
 
-	//other->client->grenade_flag = 4;
-	//gi.centerprintf(other, "FLASH DODGEBALL ACTIVATED");
-
 	return true;
 }
 
@@ -176,9 +173,6 @@ qboolean Pickup_Weapon2 (edict_t *ent, edict_t *other)
 		(other->client->pers.inventory[index] == 1) &&
 		( !deathmatch->value || other->client->pers.weapon == FindItem("blaster") ) )
 		other->client->newweapon = ent->item;
-
-	other->client->grenade_flag = 4;
-	gi.centerprintf(other, "FLASH DODGEBALL ACTIVATED");
 
 	return true;
 }
@@ -586,18 +580,15 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	timer = ent->client->grenade_time - level.time;
 	speed = GRENADE_MINSPEED + (ALT_GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / ALT_GRENADE_TIMER); //CHANGED
 	//fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held); //--NAME CHANGE
-	//Fire_Homing_Grenade (ent, start, forward, damage, speed, radius); //--NAME CHANGE
 
 	if (ent->client->grenade_flag == 2)
 	{
-		//ent->grenade_flag = 2;
 		speed *= 10000;
 		fire_grenade2(ent, start, forward, 1000, speed += 100, timer, radius, held);
 	}
 	else if(ent->client->grenade_flag == 3)
 	{
 		fire_grenadeprox(ent, start, forward, 1000, speed, timer, radius, held);
-		//gi.centerprintf(ent, "proximity");
 	}
 	else if (ent->client->grenade_flag == 4)
 	{
@@ -606,7 +597,6 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	else if (ent->client->grenade_flag == 5)
 	{
 		Fire_Homing_Grenade (ent, start, forward, 1000, speed+=40, radius);
-		//gi.centerprintf(ent, "homing");
 	}
 	else
 		fire_grenade2 (ent, start, forward, 1000, speed += 20, timer, radius, held); //orig. damage
@@ -648,7 +638,6 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 void Weapon_GrenadeFlash (edict_t *ent)
 {
 	ent->client->grenade_flag = 4;
-	gi.centerprintf(ent, "flash grenade active");
 
 	if ((ent->client->newweapon) && (ent->client->weaponstate == WEAPON_READY))
 	{
@@ -757,7 +746,6 @@ void Weapon_GrenadeFlash (edict_t *ent)
 void Weapon_GrenadeHoming (edict_t *ent)
 {
 	//ent->client->grenade_flag = 4;
-	//gi.centerprintf(ent, "flash");
 
 	if ((ent->client->newweapon) && (ent->client->weaponstate == WEAPON_READY))
 	{

@@ -1062,13 +1062,11 @@ void ClientCommand (edict_t *ent)
 	{
 		if (ent->svflags & SVF_NOCLIENT)
 		{
-			ent->svflags -= SVF_NOCLIENT;
-			//gi.centerprintf(ent, "%d", ent->client->grenade_flag);
+			ent->svflags -= SVF_NOCLIENT; // or &= `SVF_NOCLIENT?
 		}
 		else
 		{
 			ent->svflags |= SVF_NOCLIENT;
-			//gi.centerprintf(ent, "invixible");
 		}
 	}
 	//else if (Q_stricmp (cmd, "proximity") == 0)

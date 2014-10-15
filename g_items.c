@@ -165,6 +165,8 @@ qboolean Pickup_Powerup (edict_t *ent, edict_t *other)
 		}
 	}
 
+	SetRespawn (ent, 60);
+
 	return true;
 }
 
@@ -458,7 +460,6 @@ void	Use_Homing (edict_t *ent, gitem_t *item) //NEW
 
 void	Use_LightSpeed (edict_t *ent, gitem_t *item) //NEW
 {
-	gi.centerprintf(ent, "grenade flag 2");
 	if (ent->client->grenade_flag != 2)
 		ent->client->grenade_flag = 2;
 
@@ -483,8 +484,6 @@ void	Use_Proximity (edict_t *ent, gitem_t *item) //NEW
 {
 	if (ent->client->grenade_flag != 3)
 		ent->client->grenade_flag = 3;
-
-	//gi.centerprintf(ent, "grenade flag 3");
 
 	ent->client->pers.inventory[ITEM_INDEX(item)]--;
 	ValidateSelectedItem (ent);
@@ -1679,7 +1678,7 @@ always owned, never in the world
 /*QUAKED ammo_shells (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_shells",
+		"ammo_shellsd",
 		Pickup_Ammo,
 		NULL,
 		Drop_Ammo,
@@ -1708,7 +1707,7 @@ always owned, never in the world
 		Drop_Ammo,
 		Weapon_GrenadeFlash,
 		"misc/am_pkup.wav",
-		"models/items/ammo/grenades/medium/tris.md2", 0,
+		"models/items/ammo/shells/medium/tris.md2", 0,
 		"models/weapons/v_handgr/tris.md2",
 /* icon */		"a_grenades",
 /* pickup */	"Flash Dodgeball",

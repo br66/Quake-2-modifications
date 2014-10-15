@@ -287,6 +287,18 @@ void CheckDMRules (void)
 	int			i;
 	gclient_t	*cl;
 
+	edict_t		*ent;
+	edict_t		*best = NULL;
+
+	int			bestscore = 0;
+
+	for (i=0 ; i<maxclients->value ; i++)
+	{
+		cl = game.clients + i;
+		if (!g_edicts[i+1].inuse)
+			continue;
+	}
+
 	if (level.intermissiontime)
 		return;
 
@@ -305,18 +317,37 @@ void CheckDMRules (void)
 
 	if (fraglimit->value)
 	{
-		for (i=0 ; i<maxclients->value ; i++)
+		if (cl->resp.score >= fraglimit->value)
 		{
-			cl = game.clients + i;
-			if (!g_edicts[i+1].inuse)
-				continue;
+			gi.bprintf (PRINT_HIGH, "Fraglimit hit.\n");
+			EndDMLevel ();
+			return;
+		}
+	}
 
-			if (cl->resp.score >= fraglimit->value)
-			{
-				gi.bprintf (PRINT_HIGH, "Fraglimit hit.\n");
-				EndDMLevel ();
-				return;
-			}
+	best = NULL;
+	for (i=0 ; i<maxclients->value ; i++)
+	{
+		cl = game.clients + i;
+		if (!g_edicts[i+1].inuse)
+			continue;
+
+		ent = g_edicts + 1 + i;
+		ent->s.effects &= ~EF_POWERSCREEN;
+
+		if (ent->client->resp.score == 0)
+		{
+			bestscore = cl->resp.score;
+			best = ent;
+		}
+		else if (ent->client->resp.score == bestscore)
+		{
+			best = NULL;
+		}
+
+		if (best != NULL)
+		{
+			best->s.effects |= EF_POWERSCREEN;
 		}
 	}
 }
