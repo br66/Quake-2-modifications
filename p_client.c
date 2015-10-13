@@ -1723,9 +1723,9 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	//homGrenadeLoc[1] = 538;
 	//homGrenadeLoc[2] = 528;
 
-
 	level.current_entity = ent;
 	client = ent->client;
+	//printf("%s", ent->count);
 
 	GetHighScorer(); //each frame and each second? souns a bit redundant
 
@@ -1767,7 +1767,8 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			client->ps.pmove.pm_type = PM_GIB;
 		else if (ent->deadflag)
 			client->ps.pmove.pm_type = PM_DEAD;
-		else
+		else //if (ent->number == 100)
+			//client->ps.pmove.pm_time = PM_FREEZE;
 			client->ps.pmove.pm_type = PM_NORMAL;
 
 		client->ps.pmove.gravity = sv_gravity->value;
@@ -1918,7 +1919,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	//think slowly
 	//gi.centerprintf(
 
-	///gi.centerprintf(ent, "%f, %f, %f", ent->s.origin[0], ent->s.origin[1], ent->s.origin[2]);
+	//gi.centerprintf(ent, "%f, %f, %f", ent->s.origin[0], ent->s.origin[1], ent->s.origin[2]);
 }
 
 

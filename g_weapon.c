@@ -593,10 +593,10 @@ static void GrenadeLauncher_Explode (edict_t *ent)
 		quad4[1] = -5;
 		quad4[2] = ent->s.origin[2];
 
-		fire_grenade2(ent->owner, ent->s.origin, quad1, 1000, 1.5, 1, 120, 0);
-		fire_grenade2(ent->owner, ent->s.origin, quad2, 1000, 1.5, 1, 120, 0);
-		fire_grenade2(ent->owner, ent->s.origin, quad3, 1000, 1.5, 1, 120, 0);
-		fire_grenade2(ent->owner, ent->s.origin, quad4, 1000, 1.5, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad1, 1000, 2, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad2, 1000, 2, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad3, 1000, 2, 1, 120, 0);
+		fire_grenade2(ent->owner, ent->s.origin, quad4, 1000, 2, 1, 120, 0);
 		}
 	}
 }
@@ -811,6 +811,7 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	Grenade_Explode (ent);
 }
 
+
 void Flash_Explode (edict_t *ent)
 {
 	vec3_t	offset, origin;
@@ -895,7 +896,7 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	grenade->s.effects |= EF_GRENADE;
 	VectorClear (grenade->mins);
 	VectorClear (grenade->maxs);
-	grenade->s.modelindex = gi.modelindex ("models/objects/grenade/tris.md2");
+	grenade->s.modelindex = gi.modelindex ("models/objects/grenade2/tris.md2");
 
 	if (grenade->owner->client->dblauncher_flag == 1)
 	{
@@ -954,15 +955,19 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 	VectorClear (grenade->maxs);
 	grenade->s.modelindex = gi.modelindex ("models/objects/grenade2/tris.md2");
 	grenade->owner = self;
-	grenade->touch = Grenade_Explode;
+	grenade->touch = Grenade_Touch;
 	grenade->nextthink = level.time + timer;
 	
 	if (grenade->owner->client->dblauncher_flag == 1)
 	{
+		grenade->touch = Grenade_Touch;
 		grenade->think = Grenade_Explode;
 	}
 	else
-		grenade->think = G_FreeEdict;
+	{
+		//grenade->touch = Grenade_Explode;
+		grenade->think = Grenade_To_Ammo;
+	}
 
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
@@ -1403,7 +1408,7 @@ void bfg_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 	// core explosion - prevents firing it into the wall/floor <<< NO NEW MOVETYPE WILL TAKE CARE OF THAT
 	if (other->takedamage)
 	{
-		T_Damage (other, self, self->owner, self->velocity, self->s.origin, plane->normal, 200, 0, 0, MOD_BFG_BLAST);
+		T_Damage (other, self, self->owner, self->velocity, self->s.origin, plane->normal, 2000, 0, 0, MOD_BFG_BLAST);
 		gi.sound (self, CHAN_VOICE, gi.soundindex ("weapons/bfg__x1b.wav"), 1, ATTN_NORM, 0);
 		//self->solid = SOLID_NOT;
 		//self->touch = NULL;
@@ -1418,7 +1423,7 @@ void bfg_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 		//self->enemy = other;
 	}
 	
-	T_RadiusDamage(self, self->owner, 200, other, 100, MOD_BFG_BLAST);
+	T_RadiusDamage(self, self->owner, 2000, other, 100, MOD_BFG_BLAST);
 
 	//EXPLODE ON ANY TOUCH
 	//gi.WriteByte (svc_temp_entity);

@@ -44,7 +44,7 @@ struct gclient_s
 	// this point in the structure
 };
 
-
+//WTF ID THIS LOOKS SILLY
 struct edict_s
 {
 	entity_state_t	s;
@@ -71,6 +71,8 @@ struct edict_s
 
 	// the game dll can add anything it wants after
 	// this point in the structure
+
+	//BUT THE GAME DLL WILL ALWAYS ADD THE OTHER STUFF WTF
 };
 
 #endif		// GAME_INCLUDE

@@ -1121,6 +1121,8 @@ struct edict_s
 	monsterinfo_t	monsterinfo;
 
 	int			grenade_flag; //NEW
+	//SHOULDN'T THIS ALL BE IN GAME.H?!?!?!?!?!?!?	
+	//SO THAT YOU DON'T PUT THIS IN TWICE?!?!?!?!?
 };
 
 #define		GRENADE_NORMAL		0

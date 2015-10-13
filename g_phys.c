@@ -94,7 +94,7 @@ qboolean SV_RunThink (edict_t *ent)
 /*
 ==================
 SV_Impact
-
+#collision
 Two entities have touched, so run their touch functions
 ==================
 */
@@ -303,6 +303,7 @@ SV_AddGravity
 void SV_AddGravity (edict_t *ent)
 {
 	ent->velocity[2] -= ent->gravity * sv_gravity->value * FRAMETIME;
+	//gi.dprintf("%s", ent->classname);
 }
 
 /*

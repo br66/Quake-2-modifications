@@ -165,7 +165,7 @@ qboolean Pickup_Powerup (edict_t *ent, edict_t *other)
 		}
 	}
 
-	SetRespawn (ent, 60);
+	SetRespawn (ent, 20);
 
 	return true;
 }
@@ -617,7 +617,7 @@ qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 	if (!Add_Ammo (other, ent->item, count))
 		return false;
 
-	if (weapon && !oldcount) //??
+	if (weapon && !oldcount) // if weapon is an item with a weapon flag and there is no original count
 	{
 		if (other->client->pers.weapon != ent->item && ( !deathmatch->value || other->client->pers.weapon == FindItem("blaster") ) )
 			other->client->newweapon = ent->item;
@@ -1322,7 +1322,7 @@ gitem_t	itemlist[] =
 /*QUAKED item_armor_jacket (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"item_armor_jacket", 
+		"item_armor_jacketz", 
 		Pickup_Armor,
 		NULL,
 		NULL,
@@ -1444,7 +1444,7 @@ always owned, never in the world
 /*QUAKED weapon_shotgun (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"weapon_shotgun", 
+		"weapon_shotgunz", 
 		Pickup_Weapon, //<------make this null to disable? making this null means making it 0, won't the operating system stop the program?
 		Use_Weapon,
 		Drop_Weapon,
@@ -1490,7 +1490,7 @@ always owned, never in the world
 /*QUAKED weapon_machinegun (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"weapon_machinegun", 
+		"weapon_machinegunz", 
 		Pickup_Weapon,
 		Use_Weapon,
 		Drop_Weapon,
@@ -1770,7 +1770,7 @@ always owned, never in the world
 /*QUAKED ammo_slugs (.3 .3 1) (-16 -16 -16) (16 16 16)
 */
 	{
-		"ammo_slugs",
+		"ammo_slugsz",
 		Pickup_Ammo,
 		NULL,
 		Drop_Ammo,
@@ -2007,13 +2007,13 @@ gives +1 to maximum health
 */
 	{
 		"item_moongravity",
-		Pickup_Powerup, //WARNING CHANGE TO PICKUP FUNCTION COMPLETELY REMOVE SETRESPAWN
-		Use_MoonGravity, //???
+		Pickup_Powerup,
+		Use_MoonGravity,
 		Drop_General,
 		NULL,
 		"items/pkup.wav",
 		"models/items/invulner/tris.md2", EF_ROTATE,
-		NULL, //???
+		NULL,
 /* icon */		"p_invulnerability",
 /* pickup */	"Moon Gravity",
 /* width */		2,
@@ -2304,10 +2304,10 @@ void SP_item_health (edict_t *self)
 		return;
 	}
 
-	self->model = "models/items/healing/medium/tris.md2";
-	self->count = 10;
-	SpawnItem (self, FindItem ("Health"));
-	gi.soundindex ("items/n_health.wav");
+	//self->model = "models/items/healing/medium/tris.md2";
+	//self->count = 10;
+	//SpawnItem (self, FindItem ("Health"));
+	//gi.soundindex ("items/n_health.wav");
 }
 
 /*QUAKED item_health_small (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -2320,11 +2320,11 @@ void SP_item_health_small (edict_t *self)
 		return;
 	}
 
-	self->model = "models/items/healing/stimpack/tris.md2";
-	self->count = 2;
-	SpawnItem (self, FindItem ("Health"));
-	self->style = HEALTH_IGNORE_MAX;
-	gi.soundindex ("items/s_health.wav");
+	//self->model = "models/items/healing/stimpack/tris.md2";
+	//self->count = 2;
+	//SpawnItem (self, FindItem ("Health"));
+	//self->style = HEALTH_IGNORE_MAX;
+	//gi.soundindex ("items/s_health.wav");
 }
 
 /*QUAKED item_health_large (.3 .3 1) (-16 -16 -16) (16 16 16)
